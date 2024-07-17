@@ -6,7 +6,7 @@ spring:
     hibernate:
       ddl-auto: create
 #  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    driver-class-name: org.mariadb.jdbc.Driver
 #    url: jdbc:mysql://localhost:13306/jpa_demo
 #    username: root
 #    password: tkdgus1234
