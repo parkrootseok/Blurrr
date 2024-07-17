@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: create
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:13306/jpa_demo
+#    username: root
+#    password: tkdgus1234
+
+server:
+  port: 8080
