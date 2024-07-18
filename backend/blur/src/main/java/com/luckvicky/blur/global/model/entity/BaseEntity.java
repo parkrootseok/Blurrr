@@ -2,8 +2,11 @@ package com.luckvicky.blur.global.model.entity;
 
 import static com.luckvicky.blur.global.constant.StringFormat.TIMESTAMP_FORMAT;
 
+import com.luckvicky.blur.global.enums.status.ActivateStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -18,6 +21,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
+
+    @Enumerated(EnumType.STRING)
+    private ActivateStatus status;
 
     @CreatedDate
     @Column(updatable = false)
