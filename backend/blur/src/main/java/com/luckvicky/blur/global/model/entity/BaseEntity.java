@@ -33,8 +33,17 @@ public abstract class BaseEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    public void active() {
+        this.status = ActivateStatus.ACTIVE;
+    }
+
+    public void inactive() {
+        this.status = ActivateStatus.INACTIVE;
+    }
+
     @PrePersist
     public void onPrePersist() {
+        this.status = ActivateStatus.ACTIVE;
         this.createdAt = ClockUtil.getLocalDateTime();
         this.updatedAt = this.createdAt;
     }
