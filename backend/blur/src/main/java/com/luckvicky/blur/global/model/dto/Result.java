@@ -1,10 +1,6 @@
 package com.luckvicky.blur.global.model.dto;
 
-import static com.luckvicky.blur.global.constant.StringFormat.TIMESTAMP_FORMAT;
-
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import com.luckvicky.blur.global.util.ClockUtil;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,7 +17,7 @@ public class Result<T> {
 
     @Builder
     public Result(T data) {
-        this.timestamp = LocalDateTime.now(Clock.systemDefaultZone()).format(DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT));
+        this.timestamp = ClockUtil.getLocalDateTimeToString();
         this.trackingId = UUID.randomUUID();
         this.data = data;
     }
