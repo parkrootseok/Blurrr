@@ -6,7 +6,7 @@ import com.luckvicky.blur.global.util.UuidUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "게시글 생성 요청")
-public record CreateBoardRequest(
+public record CreateBoardDto(
 
         @Schema(
                 description = "제목",
