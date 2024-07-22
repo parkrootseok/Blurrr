@@ -34,6 +34,7 @@ public enum ErrorCode {
      * [404 Not Found]
      * - 존재하지 않는 자원
      */
+    NOT_EXIST_LEAGUE(HttpStatus.NOT_FOUND, "존재하지 않는 리그입니다."),
     NOT_EXIST_MEMBER(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다.");
 
     /**
