@@ -33,16 +33,28 @@ public class LeagueController {
 
     private final LeagueService leagueService;
 
+    @Operation(summary = "리그 생성 API")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "리그 생성 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "리그 생성 실패"
+            )
+    })
     @PostMapping
     public ResponseEntity createLeague(
             @RequestBody LeagueCreateDto request
     ) {
 
-        leagueService.createLeague(request);
-
         return ResponseUtil.created(
-                Result.builder().build()
+                Result.builder()
+                        .data(leagueService.createLeague(request))
+                        .build()
         );
+
     }
 
     @Operation(summary = "리그 유형별 조회 API")
