@@ -8,5 +8,5 @@ public interface LeagueService {
 
     List<LeagueDto> searchLeaguesByLeagueType(String leagueType);
 
-    void createLeague(LeagueCreateDto request);
+    Boolean createLeague(LeagueCreateDto request);
 }
