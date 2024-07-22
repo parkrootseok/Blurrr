@@ -4,6 +4,7 @@ import static com.luckvicky.blur.global.enums.code.ErrorCode.INVALID_LEAGUE_TYPE
 
 import com.luckvicky.blur.domain.league.exception.InvalidLeagueTypeException;
 import com.luckvicky.blur.domain.league.model.dto.LeagueDto;
+import com.luckvicky.blur.domain.league.model.dto.request.LeagueCreateDto;
 import com.luckvicky.blur.domain.league.model.entity.League;
 import com.luckvicky.blur.domain.league.model.entity.LeagueType;
 import com.luckvicky.blur.domain.league.repository.LeagueRepository;
@@ -20,6 +21,7 @@ public class LeagueServiceImpl implements LeagueService {
     private final ModelMapper mapper;
     private final LeagueRepository leagueRepository;
 
+    @Override
     public List<LeagueDto> searchLeaguesByLeagueType(String leagueType) {
 
         LeagueType leagueTypeToEnum = convertToEnum(leagueType);
@@ -33,6 +35,14 @@ public class LeagueServiceImpl implements LeagueService {
                 .collect(Collectors.toList());
 
         return leagueDtos;
+
+    }
+
+    @Override
+    public void createLeague(LeagueCreateDto request) {
+
+        LeagueType type = LeagueType.valueOf(request.type());
+        leagueRepository.save(request.toEntity(type));
 
     }
 
