@@ -17,10 +17,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board extends BaseEntity {
 
-    @Id
-    @Column(nullable = false, columnDefinition = "BINARY(16)")
-    private UUID id;
-
     // todo: 멤버 엔티티 연관관계 매핑
 
     @Column(nullable = false, length = 20)
@@ -36,8 +32,7 @@ public class Board extends BaseEntity {
     private BoardType type;
 
     @Builder
-    public Board (UUID id, String title, String content, BoardType type) {
-        this.id = id;
+    public Board (String title, String content, BoardType type) {
         this.title = title;
         this.content = content;
         this.viewCount = 0L;
