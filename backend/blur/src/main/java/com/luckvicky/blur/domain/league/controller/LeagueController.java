@@ -1,6 +1,7 @@
 package com.luckvicky.blur.domain.league.controller;
 
 import com.luckvicky.blur.domain.league.model.dto.LeagueDto;
+import com.luckvicky.blur.domain.league.model.dto.request.LeagueCreateDto;
 import com.luckvicky.blur.domain.league.model.dto.response.LeagueListResponse;
 import com.luckvicky.blur.domain.league.service.LeagueService;
 import com.luckvicky.blur.global.model.dto.Result;
@@ -18,6 +19,8 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class LeagueController {
 
     private final LeagueService leagueService;
+
+    @PostMapping
+    public ResponseEntity createLeague(
+            @RequestBody LeagueCreateDto request
+    ) {
+
+        leagueService.createLeague(request);
+
+        return ResponseUtil.created(
+                Result.builder().build()
+        );
+    }
 
     @Operation(summary = "리그 유형별 조회 API")
     @ApiResponses({
