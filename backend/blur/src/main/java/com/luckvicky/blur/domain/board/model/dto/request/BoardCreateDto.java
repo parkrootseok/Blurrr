@@ -3,12 +3,11 @@ package com.luckvicky.blur.domain.board.model.dto.request;
 import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.board.model.entity.BoardType;
 import com.luckvicky.blur.domain.member.model.entity.Member;
-import com.luckvicky.blur.global.util.UuidUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 
 @Schema(name = "게시글 생성 요청")
-public record CreateBoardDto(
+public record BoardCreateDto(
 
         @Schema(
                 description = "제목",
@@ -18,7 +17,7 @@ public record CreateBoardDto(
         String title,
 
         @Schema(
-                description = "작성자 고유 식별값",
+                description = "사용자 고유 식별값",
                 example = "11ef4830-22b0-8bab-bdb9-5b68a61f28a6"
         )
         UUID memberId,

@@ -1,7 +1,7 @@
 package com.luckvicky.blur.domain.board.controller;
 
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
-import com.luckvicky.blur.domain.board.model.dto.request.CreateBoardDto;
+import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateDto;
 import com.luckvicky.blur.domain.board.model.dto.response.BoardListDto;
 import com.luckvicky.blur.domain.board.service.BoardService;
 import com.luckvicky.blur.global.model.dto.Result;
@@ -31,7 +31,7 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @Operation(summary = "게사글 생성 API")
+    @Operation(summary = "게시글 생성 API")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
@@ -43,7 +43,7 @@ public class BoardController {
             )
     })
     @PostMapping
-    public ResponseEntity createBoard(@RequestBody CreateBoardDto request) {
+    public ResponseEntity createBoard(@RequestBody BoardCreateDto request) {
        return ResponseUtil.created(
                Result.builder()
                        .data(boardService.createBoard(request))
