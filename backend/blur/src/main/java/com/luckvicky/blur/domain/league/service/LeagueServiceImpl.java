@@ -1,7 +1,9 @@
 package com.luckvicky.blur.domain.league.service;
 
 import static com.luckvicky.blur.global.enums.code.ErrorCode.INVALID_LEAGUE_TYPE;
+import static com.luckvicky.blur.global.enums.code.ErrorCode.NOT_EXIST_LEAGUE;
 
+import com.luckvicky.blur.domain.league.exception.FailToCreateLeagueException;
 import com.luckvicky.blur.domain.league.exception.InvalidLeagueTypeException;
 import com.luckvicky.blur.domain.league.model.dto.LeagueDto;
 import com.luckvicky.blur.domain.league.model.dto.request.LeagueCreateDto;
@@ -39,14 +41,25 @@ public class LeagueServiceImpl implements LeagueService {
     }
 
     @Override
-    public void createLeague(LeagueCreateDto request) {
+    public Boolean createLeague(LeagueCreateDto request) {
 
         LeagueType type = LeagueType.valueOf(request.type());
-        leagueRepository.save(request.toEntity(type));
+        League createdLeague = leagueRepository.save(request.toEntity(type));
+
+        return isCreated(createdLeague);
 
     }
 
-    private static LeagueType convertToEnum(String leagueType) {
+    private boolean isCreated(League league) {
+
+        leagueRepository.findById(league.getId())
+                .orElseThrow(() -> new FailToCreateLeagueException(NOT_EXIST_LEAGUE));
+
+        return true;
+
+    }
+
+    private LeagueType convertToEnum(String leagueType) {
         try {
             return LeagueType.valueOf(leagueType);
         } catch (IllegalArgumentException e) {
