@@ -1,7 +1,5 @@
 package com.luckvicky.blur.global.model.entity;
 
-import static com.luckvicky.blur.global.constant.StringFormat.TIMESTAMP_FORMAT;
-
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
 import com.luckvicky.blur.global.util.ClockUtil;
 import com.luckvicky.blur.global.util.UuidUtil;
