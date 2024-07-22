@@ -19,7 +19,7 @@ public record LeagueBoardCreateDto(
         String title,
 
         @Schema(
-                description = "작성자 고유 식별값",
+                description = "사용자 고유 식별값",
                 example = "11ef4830-22b0-8bab-bdb9-5b68a61f28a6"
         )
         UUID memberId,
