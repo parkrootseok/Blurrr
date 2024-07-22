@@ -38,7 +38,6 @@ public record CreateBoardDto(
     // todo: 인자에 멤버 추가
     public Board toEntity(BoardType type) {
         return Board.builder()
-                .id(UuidUtil.createSequentialUUID())
                 .title(this.title)
                 .content(this.content)
                 .type(type)
