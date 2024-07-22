@@ -15,13 +15,18 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
+@SuperBuilder
 @MappedSuperclass
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
