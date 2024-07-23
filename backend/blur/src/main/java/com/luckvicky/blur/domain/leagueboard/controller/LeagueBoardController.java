@@ -1,5 +1,6 @@
 package com.luckvicky.blur.domain.leagueboard.controller;
 
+import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.leagueboard.model.dto.request.LeagueBoardCreateDto;
 import com.luckvicky.blur.domain.leagueboard.service.LeagueBoardService;
 import com.luckvicky.blur.global.model.dto.Result;
@@ -9,9 +10,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "게시글 API")
 @RestController
-@RequestMapping("/boards")
+@RequestMapping("/v1/boards")
 @RequiredArgsConstructor
 public class LeagueBoardController {
 
@@ -46,6 +51,27 @@ public class LeagueBoardController {
         return ResponseUtil.created(
                 Result.builder()
                         .data(leagueBoardService.createLeagueBoard(leagueId ,request))
+                        .build()
+        );
+
+    }
+
+    @GetMapping("/legues/{leagueId}")
+    public ResponseEntity getLeagueBoard(
+            @PathVariable(name = "leagueId") UUID leagueId
+    ) {
+
+        List<BoardDto> boardDtos = leagueBoardService.getLeagueBoard(leagueId);
+
+        if (Objects.isNull(boardDtos) || boardDtos.isEmpty()) {
+            return ResponseUtil.noContent(
+                    Result.builder().build()
+            );
+        }
+
+        return ResponseUtil.ok(
+                Result.builder()
+                        .data(boardDtos)
                         .build()
         );
 
