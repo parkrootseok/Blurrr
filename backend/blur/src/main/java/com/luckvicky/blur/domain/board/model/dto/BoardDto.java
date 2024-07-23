@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
-@Schema(description = "게시물 Dto")
+@Schema(name = "게시물 정보")
 public class BoardDto {
 
     @Schema(description = "고유 식별값")

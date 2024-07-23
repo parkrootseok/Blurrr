@@ -11,7 +11,7 @@ import com.luckvicky.blur.domain.board.repository.BoardRepository;
 import com.luckvicky.blur.domain.league.exception.NotExistLeagueException;
 import com.luckvicky.blur.domain.league.model.entity.League;
 import com.luckvicky.blur.domain.league.repository.LeagueRepository;
-import com.luckvicky.blur.domain.leagueboard.model.dto.request.LeagueBoardCreateDto;
+import com.luckvicky.blur.domain.leagueboard.model.dto.request.LeagueBoardCreateRequest;
 import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
 import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
 import com.luckvicky.blur.domain.member.exception.NotExistMemberException;
@@ -35,7 +35,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     private final LeagueBoardRepository leagueBoardRepository;
 
     @Override
-    public boolean createLeagueBoard(UUID leagueId, LeagueBoardCreateDto request) {
+    public boolean createLeagueBoard(UUID leagueId, LeagueBoardCreateRequest request) {
 
         Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new NotExistMemberException(NOT_EXIST_MEMBER));
