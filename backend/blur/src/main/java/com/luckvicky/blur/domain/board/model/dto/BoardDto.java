@@ -1,5 +1,6 @@
 package com.luckvicky.blur.domain.board.model.dto;
 
+import com.luckvicky.blur.domain.member.model.MemberDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -7,13 +8,20 @@ import lombok.Getter;
 @Schema(description = "게시물 Dto")
 public class BoardDto {
 
-    @Schema(description = "게시물 고유 식별값")
-    String id;
+    @Schema(description = "고유 식별값")
+    private String id;
 
-    @Schema(description = "게시물 제목")
-    String title;
+    @Schema(description = "사용자 정보")
+    private MemberDto member;
 
-    @Schema(description = "게시물 생성 시간")
-    String createdAt;
+    @Schema(description = "제목")
+    private String title;
+
+    @Schema(description = "생성 시간")
+    private String createdAt;
+
+    // :todo 좋아요 수
+
+    // :todo 댓글 수
 
 }
