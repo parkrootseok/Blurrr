@@ -31,18 +31,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
-    protected ResponseEntity<Object> handleBase(BaseException e, WebRequest request) {
+    protected ResponseEntity<Object> handleBase(
+            BaseException e, WebRequest request
+    ) {
 
         ErrorCode errorCode = e.getErrorCode();
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
 
         return ResponseEntity
                 .status(errorCode.getCode())
                 .body(ErrorResponse
                         .builder(e, errorCode.getCode(), errorCode.getMessage())
                         .title(e.getClass().getSimpleName())
-                        .instance(URI.create(
-                                ((ServletWebRequest) request).getRequest().getRequestURI()
-                        ))
+                        .instance(URI.create(servletWebRequest.getRequest().getRequestURI()))
                         .build());
 
     }
@@ -54,47 +55,52 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ) {
 
         ErrorCode errorCode = FAIL_TO_VALIDATE;
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+
         BindingResult bindingResult = e.getBindingResult();
         List<String> errors = new ArrayList<>();
-        bindingResult
-                .getFieldErrors().stream()
+        bindingResult.getFieldErrors().stream()
                 .forEach(fieldError ->
-                    errors.add(
-                            String.format(
-                                    VALID_ERROR_RESULT,
-                                    fieldError.getDefaultMessage(),
-                                    fieldError.getField(),
-                                    fieldError.getRejectedValue()
-                            )));
+                        errors.add(
+                                String.format(
+                                        VALID_ERROR_RESULT,
+                                        fieldError.getDefaultMessage(),
+                                        fieldError.getField(),
+                                        fieldError.getRejectedValue()
+                                )
+                        )
+                );
 
         return ResponseEntity
                 .status(errorCode.getCode())
                 .body(ErrorResponse
                         .builder(e, errorCode.getCode(), errorCode.getMessage())
                         .title(e.getClass().getSimpleName())
-                        .instance(URI.create(
-                                ((ServletWebRequest) request).getRequest().getRequestURI()
-                        ))
+                        .instance(URI.create(servletWebRequest.getRequest().getRequestURI()))
                         .property(PROBLEM_DETAIL_KEY_ERROR, errors)
                         .build());
 
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
-    protected ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException e, WebRequest request) {
+    protected ResponseEntity<Object> handleConstraintViolation(
+            ConstraintViolationException e, WebRequest request
+    ) {
 
         ErrorCode errorCode = FAIL_TO_VALIDATE;
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+
         List<String> errors = new ArrayList<>();
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
         constraintViolations.stream()
                 .forEach(constraintViolation ->
-                    errors.add(
-                            String.format(
-                                    VALIDATED_ERROR_RESULT,
-                                    constraintViolation.getMessage(),
-                                    constraintViolation.getInvalidValue()
-                            )
-                    )
+                        errors.add(
+                                String.format(
+                                        VALIDATED_ERROR_RESULT,
+                                        constraintViolation.getMessage(),
+                                        constraintViolation.getInvalidValue()
+                                )
+                        )
                 );
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
@@ -109,9 +115,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(ErrorResponse
                         .builder(e, errorCode.getCode(), errorCode.getMessage())
                         .title(e.getClass().getSimpleName())
-                        .instance(URI.create(
-                                ((ServletWebRequest) request).getRequest().getRequestURI()
-                        ))
+                        .instance(URI.create(servletWebRequest.getRequest().getRequestURI()))
                         .property(PROBLEM_DETAIL_KEY_ERROR, errors)
                         .build());
     }
