@@ -9,6 +9,7 @@ import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -134,6 +135,29 @@ public class CommentController {
 
     }
 
+
+    @Operation(
+            summary = "댓글 삭제 API",
+            description = "댓글, 게시글 고유 식별값을 받아 일치하는 댓글을 삭제한다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "삭제 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 댓글, 게시글"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "DB 삭제 실패"
+            ),
+    })
+    @Parameters({
+            @Parameter(name = "commentId", description = "댓글 고유 식별값"),
+            @Parameter(name = "boardId", description = "게시글 고유 식별값")
+    })
     @PutMapping("/{commentId}/boards/{boardId}")
     public ResponseEntity deleteComment(
             @PathVariable(name = "commentId") UUID commentId,
