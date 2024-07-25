@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -128,6 +129,20 @@ public class CommentController {
         return ResponseUtil.ok(
                 Result.builder()
                         .data(CommentListResponse.of(comments))
+                        .build()
+        );
+
+    }
+
+    @PutMapping("/{commentId}/boards/{boardId}")
+    public ResponseEntity deleteComment(
+            @PathVariable(name = "commentId") UUID commentId,
+            @PathVariable(name = "boardId") UUID boardId
+    ) {
+
+        return ResponseUtil.ok(
+                Result.builder()
+                        .data(commentService.deleteComment(commentId, boardId))
                         .build()
         );
 
