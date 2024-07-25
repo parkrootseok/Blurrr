@@ -40,8 +40,6 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(NotExistBoardException::new);
 
         board.increaseCommentCount();
-
-        board.increaseCommentCount();
         Comment createdComment = commentRepository.save(
                 request.toEntity(member, board)
         );
