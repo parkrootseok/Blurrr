@@ -3,7 +3,6 @@ package com.luckvicky.blur.domain.board.service;
 import static com.luckvicky.blur.global.constant.Number.LEAGUE_BOARD_PAGE_SIZE;
 import static com.luckvicky.blur.global.enums.code.ErrorCode.FAIL_TO_CREATE_BOARD;
 import static com.luckvicky.blur.global.enums.code.ErrorCode.INVALID_BOARD_TYPE;
-import static com.luckvicky.blur.global.enums.code.ErrorCode.NOT_EXIST_MEMBER;
 
 import com.luckvicky.blur.domain.board.exception.FailToCreateBoardException;
 import com.luckvicky.blur.domain.board.exception.InvalidBoardTypeException;
@@ -12,11 +11,15 @@ import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateRequest;
 import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.board.model.entity.BoardType;
 import com.luckvicky.blur.domain.board.repository.BoardRepository;
-import com.luckvicky.blur.domain.member.exception.NotExistMemberException;
+import com.luckvicky.blur.domain.comment.model.dto.CommentDto;
+import com.luckvicky.blur.domain.comment.model.entity.Comment;
+import com.luckvicky.blur.domain.comment.model.entity.CommentType;
+import com.luckvicky.blur.domain.comment.repository.CommentRepository;
 import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.domain.member.repository.MemberRepository;
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -35,6 +38,7 @@ public class BoardServiceImpl implements BoardService {
     private final ModelMapper mapper;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public Boolean createBoard(BoardCreateRequest request) {
@@ -66,6 +70,17 @@ public class BoardServiceImpl implements BoardService {
         return boards.stream()
                 .map(board -> mapper.map(board, BoardDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentDto> getComments(UUID boardId) {
+
+        Board board = boardRepository.getOrThrow(boardId);
+
+        return board.getComments().stream()
+                .map(comment -> mapper.map(comment, CommentDto.class))
+                .collect(Collectors.toList());
+
     }
 
     private boolean isCreated(Board createdBoard) {
