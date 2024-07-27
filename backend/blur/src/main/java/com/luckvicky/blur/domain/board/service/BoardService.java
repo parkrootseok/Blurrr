@@ -8,6 +8,6 @@ public interface BoardService {
 
     Boolean createBoard(BoardCreateRequest request);
 
-    List<BoardDto> findBoardsByType(String boardType);
+    List<BoardDto> findBoardsByType(String boardType, int pageNumber, String criteria);
 
 }

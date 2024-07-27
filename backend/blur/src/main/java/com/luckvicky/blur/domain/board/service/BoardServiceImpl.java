@@ -1,5 +1,6 @@
 package com.luckvicky.blur.domain.board.service;
 
+import static com.luckvicky.blur.global.constant.Number.LEAGUE_BOARD_PAGE_SIZE;
 import static com.luckvicky.blur.global.enums.code.ErrorCode.FAIL_TO_CREATE_BOARD;
 import static com.luckvicky.blur.global.enums.code.ErrorCode.INVALID_BOARD_TYPE;
 import static com.luckvicky.blur.global.enums.code.ErrorCode.NOT_EXIST_MEMBER;
@@ -14,13 +15,20 @@ import com.luckvicky.blur.domain.board.repository.BoardRepository;
 import com.luckvicky.blur.domain.member.exception.NotExistMemberException;
 import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.domain.member.repository.MemberRepository;
+import com.luckvicky.blur.global.enums.status.ActivateStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
 
@@ -44,10 +52,16 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<BoardDto> findBoardsByType(String boardType) {
+    @Transactional(readOnly = true)
+    public List<BoardDto> findBoardsByType(String boardType, int pageNumber, String criteria) {
 
         BoardType type = convertToEnum(boardType);
-        List<Board> boards = boardRepository.findAllByType(type);
+        Pageable pageable = PageRequest.of(
+                pageNumber, LEAGUE_BOARD_PAGE_SIZE,
+                Sort.by(Direction.DESC, criteria));
+
+        List<Board> boards = boardRepository
+                .findAllByTypeAndStatus(type, pageable, ActivateStatus.ACTIVE).getContent();
 
         return boards.stream()
                 .map(board -> mapper.map(board, BoardDto.class))
