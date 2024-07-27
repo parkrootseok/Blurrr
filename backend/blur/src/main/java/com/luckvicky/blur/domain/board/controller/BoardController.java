@@ -8,6 +8,7 @@ import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -54,7 +55,10 @@ public class BoardController {
 
     }
 
-    @Operation(summary = "유형별 게시글 목록 조회 API")
+    @Operation(
+            summary = "유형별 게시글 목록 조회 API",
+            description = "유형과 일치하는 모든 게시글의 목록을 조회한다."
+    )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -70,18 +74,36 @@ public class BoardController {
                     description = "유효하지 않은 유형에 대한 게시글 조회로 실패"
             )
     })
-    @Parameter(
-            name = "boardType",
-            examples = {
-                    @ExampleObject(name = "channel", value = "CHANNEL"),
-                    @ExampleObject(name = "league", value = "LEAGUE"),
-                    @ExampleObject(name = "dashcam", value = "DASHCAM"),
-            }
-    )
+    @Parameters({
+            @Parameter(
+                    name = "boardType",
+                    description = "게시글 유형",
+                    examples = {
+                            @ExampleObject(name = "channel", value = "CHANNEL"),
+                            @ExampleObject(name = "league", value = "LEAGUE"),
+                            @ExampleObject(name = "dashcam", value = "DASHCAM"),
+                    }
+            ),
+            @Parameter(name = "pageNumber", description = "페이지 번호"),
+            @Parameter(
+                    name = "criteria",
+                    description = "정렬 기준",
+                    examples = {
+                            @ExampleObject(name = "최신", value = "createdAt"),
+                            @ExampleObject(name = "좋아요", value = "likeCount"),
+                            @ExampleObject(name = "조회수", value = "viewCount"),
+                            @ExampleObject(name = "댓글", value = "commentCount"),
+                    }
+            ),
+    })
     @GetMapping
-    public ResponseEntity findBoardsByType(@RequestParam(name = "type") String type) {
+    public ResponseEntity findBoardsByType(
+            @RequestParam(name = "type") String type,
+            @RequestParam(required = false, defaultValue = "0", value = "pageNumber") int pageNumber,
+            @RequestParam(required = false, defaultValue = "createdAt", value = "criteria") String criteria
+    ) {
 
-        List<BoardDto> boards = boardService.findBoardsByType(type);
+        List<BoardDto> boards = boardService.findBoardsByType(type, pageNumber, criteria);
 
         if (Objects.isNull(boards) || boards.isEmpty()) {
             return ResponseUtil.noContent(
