@@ -73,21 +73,11 @@ public class CommentServiceImpl implements CommentService {
 
         Board board = boardRepository.getOrThrow(boardId);
 
-        List<Comment> comments = commentRepository
-                .findAllByBoardAndTypeAndStatus(board, CommentType.COMMENT, ActivateStatus.ACTIVE);
+        List<Comment> comments = commentRepository.findAllByBoardAndType(board, CommentType.COMMENT);
 
-        List<CommentDto> commentDtos = comments.stream()
+        return comments.stream()
                 .map(comment -> mapper.map(comment, CommentDto.class))
                 .collect(Collectors.toList());
-
-        commentDtos.forEach(comment ->
-            comment.getReply()
-                    .removeIf(reply ->
-                            reply.getStatus().equals(ActivateStatus.INACTIVE)
-                    )
-        );
-
-        return commentDtos;
 
     }
 
