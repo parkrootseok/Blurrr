@@ -6,13 +6,13 @@ import static com.luckvicky.blur.global.enums.code.ErrorCode.INVALID_BOARD_TYPE;
 
 import com.luckvicky.blur.domain.board.exception.FailToCreateBoardException;
 import com.luckvicky.blur.domain.board.exception.InvalidBoardTypeException;
+import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateRequest;
 import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.board.model.entity.BoardType;
 import com.luckvicky.blur.domain.board.repository.BoardRepository;
 import com.luckvicky.blur.domain.comment.model.dto.CommentDto;
-import com.luckvicky.blur.domain.comment.model.entity.Comment;
 import com.luckvicky.blur.domain.comment.model.entity.CommentType;
 import com.luckvicky.blur.domain.comment.repository.CommentRepository;
 import com.luckvicky.blur.domain.member.model.entity.Member;
@@ -73,13 +73,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentDto> getComments(UUID boardId) {
+    public BoardDetailDto getBoardDetail(UUID boardId) {
 
         Board board = boardRepository.getOrThrow(boardId);
-
-        return board.getComments().stream()
+        List<CommentDto> comments = board.getComments().stream()
+                .filter(comment -> comment.getType().equals(CommentType.COMMENT))
                 .map(comment -> mapper.map(comment, CommentDto.class))
                 .collect(Collectors.toList());
+
+        return BoardDetailDto.of(board.getContent(), board.getViewCount(), comments);
 
     }
 
