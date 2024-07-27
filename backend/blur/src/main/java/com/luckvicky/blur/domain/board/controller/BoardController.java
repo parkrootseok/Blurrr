@@ -4,11 +4,14 @@ import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateRequest;
 import com.luckvicky.blur.domain.board.model.dto.response.BoardListResponse;
 import com.luckvicky.blur.domain.board.service.BoardService;
+import com.luckvicky.blur.domain.comment.model.dto.CommentDto;
+import com.luckvicky.blur.domain.comment.model.dto.response.CommentListResponse;
 import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,9 +20,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -114,6 +119,41 @@ public class BoardController {
         return ResponseUtil.ok(
                 Result.builder()
                         .data(BoardListResponse.of(boards))
+                        .build()
+        );
+
+    }
+
+    @Operation(
+            summary = "게시글에 작성된 댓글 조회 API",
+            description = "게시글에 작성된 모든 댓글을 조회한다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "조회 완료",
+                    content = @Content(schema = @Schema(implementation = CommentListResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "조회 완료 (단, 데이터 없음)"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "존재하지 않는 게시글"
+            )
+    })
+    @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
+    @GetMapping("/{boardId}/comments")
+    public ResponseEntity getComments(
+            @PathVariable(name = "boardId") UUID boardId
+    ) {
+
+        List<CommentDto> comments = boardService.getComments(boardId);
+
+        return ResponseUtil.ok(
+                Result.builder()
+                        .data(CommentListResponse.of(comments))
                         .build()
         );
 
