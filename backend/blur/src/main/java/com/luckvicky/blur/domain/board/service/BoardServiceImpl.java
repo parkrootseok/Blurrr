@@ -6,6 +6,7 @@ import static com.luckvicky.blur.global.enums.code.ErrorCode.INVALID_BOARD_TYPE;
 
 import com.luckvicky.blur.domain.board.exception.FailToCreateBoardException;
 import com.luckvicky.blur.domain.board.exception.InvalidBoardTypeException;
+import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateRequest;
@@ -75,7 +76,9 @@ public class BoardServiceImpl implements BoardService {
     @Transactional(readOnly = true)
     public BoardDetailDto getBoardDetail(UUID boardId) {
 
-        Board board = boardRepository.getOrThrow(boardId);
+        Board board = boardRepository.findByIdWithCommentAndReply(boardId)
+                .orElseThrow(NotExistBoardException::new);
+
         List<CommentDto> comments = board.getComments().stream()
                 .filter(comment -> comment.getType().equals(CommentType.COMMENT))
                 .map(comment -> mapper.map(comment, CommentDto.class))
@@ -86,7 +89,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     private boolean isCreated(Board createdBoard) {
-        boardRepository.findById(createdBoard.getId())
+        boardRepository.findByIdWithCommentAndReply(createdBoard.getId())
                 .orElseThrow(() -> new FailToCreateBoardException(FAIL_TO_CREATE_BOARD));
 
         return true;

@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,14 +36,14 @@ public class Comment extends BaseEntity {
     private Comment comment;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> reply;
+    private List<Comment> replies = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "board_id", columnDefinition = "BINARY(36)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id", columnDefinition = "BINARY(36)", nullable = false)
     private Board board;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", columnDefinition = "BINARY(36)")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", columnDefinition = "BINARY(36)", nullable = false)
     private Member member;
 
     @Column(nullable = false, columnDefinition = "TEXT")

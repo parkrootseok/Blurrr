@@ -5,12 +5,10 @@ import static com.luckvicky.blur.global.enums.code.ErrorCode.FAIL_TO_CREATE_BOAR
 import static com.luckvicky.blur.global.enums.code.ErrorCode.NOT_EXIST_LEAGUE;
 
 import com.luckvicky.blur.domain.board.exception.FailToCreateBoardException;
-import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.comment.model.dto.CommentDto;
 import com.luckvicky.blur.domain.comment.model.entity.CommentType;
-import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardDetailResponse;
 import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.board.repository.BoardRepository;
 import com.luckvicky.blur.domain.league.exception.NotExistLeagueException;
@@ -96,7 +94,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     private boolean isCreated(Board createdLeagueBoard) {
-        boardRepository.findById(createdLeagueBoard.getId())
+        boardRepository.findByIdWithCommentAndReply(createdLeagueBoard.getId())
                 .orElseThrow(() -> new FailToCreateBoardException(FAIL_TO_CREATE_BOARD));
 
         return true;
