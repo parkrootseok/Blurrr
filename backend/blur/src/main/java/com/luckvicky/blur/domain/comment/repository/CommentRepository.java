@@ -19,11 +19,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
         return findById(id).orElseThrow(NotExistCommentException::new);
     }
 
-    List<Comment> findAllByBoardAndTypeAndStatus(
-            @Param("board") Board board,
-            @Param("type") CommentType type,
-            @Param("status") ActivateStatus status
-    );
+    List<Comment> findAllByBoardAndType(Board board, CommentType type);
 
     Optional<Comment> findByIdAndBoard(UUID commentId, Board board);
 
