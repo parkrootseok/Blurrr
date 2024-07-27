@@ -141,7 +141,7 @@ public class LeagueBoardController {
 
         return ResponseUtil.ok(
                 Result.builder()
-                        .data(leagueBoardService.getLeagueBoardDetail(boardId))
+                        .data(LeagueBoardDetailResponse.of(leagueBoardService.getLeagueBoardDetail(boardId)))
                         .build()
         );
 

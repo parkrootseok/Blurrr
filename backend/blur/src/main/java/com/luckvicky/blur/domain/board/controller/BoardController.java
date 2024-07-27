@@ -1,10 +1,11 @@
 package com.luckvicky.blur.domain.board.controller;
 
+import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateRequest;
+import com.luckvicky.blur.domain.board.model.dto.response.BoardDetailResponse;
 import com.luckvicky.blur.domain.board.model.dto.response.BoardListResponse;
 import com.luckvicky.blur.domain.board.service.BoardService;
-import com.luckvicky.blur.domain.comment.model.dto.CommentDto;
 import com.luckvicky.blur.domain.comment.model.dto.response.CommentListResponse;
 import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.util.ResponseUtil;
@@ -125,8 +126,8 @@ public class BoardController {
     }
 
     @Operation(
-            summary = "게시글에 작성된 댓글 조회 API",
-            description = "게시글에 작성된 모든 댓글을 조회한다."
+            summary = "게시글 상세 조회 API",
+            description = "특정 게시글에 대한 본문, 조회수, 댓글을 조회한다."
     )
     @ApiResponses({
             @ApiResponse(
@@ -144,16 +145,16 @@ public class BoardController {
             )
     })
     @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
-    @GetMapping("/{boardId}/comments")
+    @GetMapping("/{boardId}")
     public ResponseEntity getComments(
             @PathVariable(name = "boardId") UUID boardId
     ) {
 
-        List<CommentDto> comments = boardService.getComments(boardId);
+        BoardDetailDto boardDetail = boardService.getBoardDetail(boardId);
 
         return ResponseUtil.ok(
                 Result.builder()
-                        .data(CommentListResponse.of(comments))
+                        .data(BoardDetailResponse.of(boardDetail))
                         .build()
         );
 
