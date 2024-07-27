@@ -10,7 +10,7 @@ public interface LeagueBoardService {
 
     Boolean createLeagueBoard(UUID leagueId, LeagueBoardCreateRequest request);
 
-    List<BoardDto> getLeagueBoards(UUID leagueId);
+    List<BoardDto> getLeagueBoards(UUID leagueId, int pageNumber, String criteria);
 
     LeagueBoardDetailResponse getLeagueBoardDetail(UUID boardId);
 

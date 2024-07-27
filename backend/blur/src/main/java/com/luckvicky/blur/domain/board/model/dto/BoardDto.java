@@ -4,11 +4,16 @@ import com.luckvicky.blur.domain.member.model.MemberDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(name = "게시물 정보")
 public class BoardDto {
 
