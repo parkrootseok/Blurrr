@@ -35,9 +35,6 @@ public class Comment extends BaseEntity {
     )
     private Comment comment;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> replies = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", columnDefinition = "BINARY(36)", nullable = false)
     private Board board;
@@ -45,6 +42,9 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", columnDefinition = "BINARY(36)", nullable = false)
     private Member member;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> replies = new ArrayList<>();
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
