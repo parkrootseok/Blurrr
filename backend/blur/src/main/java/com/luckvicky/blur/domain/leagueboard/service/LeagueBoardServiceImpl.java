@@ -5,6 +5,7 @@ import static com.luckvicky.blur.global.enums.code.ErrorCode.FAIL_TO_CREATE_BOAR
 import static com.luckvicky.blur.global.enums.code.ErrorCode.NOT_EXIST_LEAGUE;
 
 import com.luckvicky.blur.domain.board.exception.FailToCreateBoardException;
+import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.comment.model.dto.CommentDto;
@@ -83,7 +84,9 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     @Transactional(readOnly = true)
     public BoardDetailDto getLeagueBoardDetail(UUID boardId) {
 
-        Board board = boardRepository.getOrThrow(boardId);
+        Board board = boardRepository.findByIdWithCommentAndReply(boardId)
+                .orElseThrow(NotExistBoardException::new);
+
         List<CommentDto> comments = board.getComments().stream()
                 .filter(comment -> comment.getType().equals(CommentType.COMMENT))
                 .map(comment -> mapper.map(comment, CommentDto.class))
