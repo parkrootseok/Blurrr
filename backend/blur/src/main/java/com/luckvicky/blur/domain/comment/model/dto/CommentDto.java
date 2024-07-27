@@ -27,6 +27,6 @@ public class CommentDto {
     private ActivateStatus status;
     
     @Schema(description = "대댓글 목록")
-    List<ReplyDto> reply;
+    List<ReplyDto> replies;
 
 }
