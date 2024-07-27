@@ -23,9 +23,9 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
             + "FROM Comment c "
             + "LEFT JOIN FETCH c.replies "
             + "LEFT JOIN FETCH c.member "
-            + "WHERE c.board.id = :boardId AND c.type = :type")
+            + "WHERE c.board = :board AND c.type = :type")
     List<Comment> findAllByBoardAndType(
-            @Param("boardId") UUID boardId,
+            @Param("board") Board board,
             @Param("type") CommentType type
     );
 
