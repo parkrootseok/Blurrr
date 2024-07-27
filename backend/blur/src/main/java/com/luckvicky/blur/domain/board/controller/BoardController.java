@@ -133,7 +133,7 @@ public class BoardController {
             @ApiResponse(
                     responseCode = "200",
                     description = "조회 완료",
-                    content = @Content(schema = @Schema(implementation = CommentListResponse.class))
+                    content = @Content(schema = @Schema(implementation = BoardDetailResponse.class))
             ),
             @ApiResponse(
                     responseCode = "204",
