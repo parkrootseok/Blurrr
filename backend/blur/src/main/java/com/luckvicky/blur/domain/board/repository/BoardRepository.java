@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -32,6 +33,7 @@ public interface BoardRepository extends JpaRepository<Board, UUID> {
     @Query("SELECT b FROM Board b WHERE b.id = :id")
     Optional<Board> findByIdForUpdate(@Param("id") UUID id);
 
+    @EntityGraph(attributePaths = "member")
     Page<Board> findAllByTypeAndStatus(BoardType type, Pageable pageable, ActivateStatus status);
 
 

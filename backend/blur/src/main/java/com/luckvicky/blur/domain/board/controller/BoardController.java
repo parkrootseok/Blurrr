@@ -83,7 +83,7 @@ public class BoardController {
     })
     @Parameters({
             @Parameter(
-                    name = "boardType",
+                    name = "type",
                     description = "게시글 유형",
                     examples = {
                             @ExampleObject(name = "channel", value = "CHANNEL"),
