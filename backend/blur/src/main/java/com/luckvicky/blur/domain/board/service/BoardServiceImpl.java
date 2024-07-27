@@ -94,7 +94,8 @@ public class BoardServiceImpl implements BoardService {
     @Transactional(readOnly = true)
     public List<CommentDto> getComments(UUID boardId) {
 
-        List<Comment> comments = commentRepository.findAllByBoardAndType(boardId, CommentType.COMMENT);
+        Board board = boardRepository.getOrThrow(boardId);
+        List<Comment> comments = commentRepository.findAllByBoardAndType(board, CommentType.COMMENT);
 
         return  comments.stream()
                 .map(comment -> mapper.map(comment, CommentDto.class))
