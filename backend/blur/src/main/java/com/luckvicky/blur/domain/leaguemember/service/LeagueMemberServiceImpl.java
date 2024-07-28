@@ -15,8 +15,10 @@ import com.luckvicky.blur.domain.member.repository.MemberRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class LeagueMemberServiceImpl implements LeagueMemberService {
 
@@ -27,8 +29,12 @@ public class LeagueMemberServiceImpl implements LeagueMemberService {
     @Override
     public Boolean createLeagueMember(UUID leagueId, UUID memberId) {
 
-        League league = leagueRepository.getOrThrow(leagueId);
+        League league = leagueRepository.findByIdForUpdate(leagueId)
+                .orElseThrow(NotExistLeagueException::new);
+
         Member member = memberRepository.getOrThrow(memberId);
+
+        league.increasePeopleCount();
 
         LeagueMember createdLeagueMember = leagueMemberRepository.save(
                 LeagueMember.builder()
