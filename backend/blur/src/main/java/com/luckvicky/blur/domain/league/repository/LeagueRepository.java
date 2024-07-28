@@ -1,7 +1,6 @@
 package com.luckvicky.blur.domain.league.repository;
 
 import com.luckvicky.blur.domain.league.exception.NotExistLeagueException;
-import com.luckvicky.blur.domain.league.model.dto.LeagueDto;
 import com.luckvicky.blur.domain.league.model.entity.League;
 import com.luckvicky.blur.domain.league.model.entity.LeagueType;
 import jakarta.persistence.LockModeType;
