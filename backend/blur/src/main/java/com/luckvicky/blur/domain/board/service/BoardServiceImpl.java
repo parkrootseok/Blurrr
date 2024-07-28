@@ -62,9 +62,11 @@ public class BoardServiceImpl implements BoardService {
     public List<BoardDto> findBoardsByType(String boardType, int pageNumber, String criteria) {
 
         BoardType type = convertToEnum(boardType);
+        SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
+
         Pageable pageable = PageRequest.of(
                 pageNumber, LEAGUE_BOARD_PAGE_SIZE,
-                Sort.by(Direction.DESC, SortingCriteria.valueOf(criteria).getCriteria())
+                Sort.by(Direction.DESC, sortingCriteria.getCriteria())
         );
 
         List<Board> boards = boardRepository
