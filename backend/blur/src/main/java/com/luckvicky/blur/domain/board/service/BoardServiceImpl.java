@@ -19,6 +19,7 @@ import com.luckvicky.blur.domain.comment.model.entity.CommentType;
 import com.luckvicky.blur.domain.comment.repository.CommentRepository;
 import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.domain.member.repository.MemberRepository;
+import com.luckvicky.blur.global.enums.filter.SortingCriteria;
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
 import java.util.List;
 import java.util.UUID;
@@ -46,7 +47,6 @@ public class BoardServiceImpl implements BoardService {
     public Boolean createBoard(BoardCreateRequest request) {
 
         BoardType type = convertToEnum(request.boardType());
-
         Member member = memberRepository.getOrThrow(request.memberId());
 
         Board createdBoard = boardRepository.save(
@@ -64,7 +64,8 @@ public class BoardServiceImpl implements BoardService {
         BoardType type = convertToEnum(boardType);
         Pageable pageable = PageRequest.of(
                 pageNumber, LEAGUE_BOARD_PAGE_SIZE,
-                Sort.by(Direction.DESC, criteria));
+                Sort.by(Direction.DESC, SortingCriteria.valueOf(criteria).getCriteria())
+        );
 
         List<Board> boards = boardRepository
                 .findAllByTypeAndStatus(type, pageable, ActivateStatus.ACTIVE).getContent();
