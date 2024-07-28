@@ -46,11 +46,11 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Boolean createBoard(BoardCreateRequest request) {
 
-        BoardType type = convertToEnum(request.boardType());
+        BoardType boardType = BoardType.convertToEnum(request.boardType());
         Member member = memberRepository.getOrThrow(request.memberId());
 
         Board createdBoard = boardRepository.save(
-                request.toEntity(member, type)
+                request.toEntity(member, boardType)
         );
 
         return isCreated(createdBoard);
@@ -59,9 +59,9 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BoardDto> findBoardsByType(String boardType, int pageNumber, String criteria) {
+    public List<BoardDto> findBoardsByType(String type, int pageNumber, String criteria) {
 
-        BoardType type = convertToEnum(boardType);
+        BoardType boardType = BoardType.convertToEnum(type);
         SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
 
         Pageable pageable = PageRequest.of(
@@ -70,7 +70,7 @@ public class BoardServiceImpl implements BoardService {
         );
 
         List<Board> boards = boardRepository
-                .findAllByTypeAndStatus(type, pageable, ActivateStatus.ACTIVE).getContent();
+                .findAllByTypeAndStatus(boardType, pageable, ActivateStatus.ACTIVE).getContent();
 
         return boards.stream()
                 .map(board -> mapper.map(board, BoardDto.class))
@@ -111,14 +111,6 @@ public class BoardServiceImpl implements BoardService {
                 .orElseThrow(() -> new FailToCreateBoardException(FAIL_TO_CREATE_BOARD));
 
         return true;
-    }
-
-    public BoardType convertToEnum(String name) {
-        try {
-            return BoardType.valueOf(name);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidBoardTypeException(INVALID_BOARD_TYPE);
-        }
     }
 
 }
