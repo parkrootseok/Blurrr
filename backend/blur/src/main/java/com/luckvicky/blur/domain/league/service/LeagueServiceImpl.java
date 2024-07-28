@@ -6,6 +6,7 @@ import com.luckvicky.blur.domain.league.exception.FailToCreateLeagueException;
 import com.luckvicky.blur.domain.league.model.dto.LeagueDto;
 import com.luckvicky.blur.domain.league.model.dto.request.LeagueCreateRequest;
 import com.luckvicky.blur.domain.league.model.entity.League;
+import com.luckvicky.blur.domain.leaguemember.model.dto.LeagueMemberDto;
 import com.luckvicky.blur.domain.leaguemember.model.entity.LeagueMember;
 import com.luckvicky.blur.domain.league.model.entity.LeagueType;
 import com.luckvicky.blur.domain.leaguemember.repository.LeagueMemberRepository;
@@ -27,8 +28,6 @@ public class LeagueServiceImpl implements LeagueService {
 
     private final ModelMapper mapper;
     private final LeagueRepository leagueRepository;
-    private final LeagueMemberRepository leagueMemberRepository;
-    private final MemberRepository memberRepository;
 
     @Override
     public List<LeagueDto> findLeagueByType(String type) {
@@ -48,25 +47,6 @@ public class LeagueServiceImpl implements LeagueService {
         League createdLeague = leagueRepository.save(request.toEntity(type));
 
         return isCreated(createdLeague);
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<LeagueDto> getLeague(UUID memberId) {
-
-        Member member = memberRepository.getOrThrow(memberId);
-
-        List<LeagueMember> leagueMembers = leagueMemberRepository.findAllByMember(member);
-
-        List<League> leagues = leagueMembers.stream()
-                .map(leagueMember ->
-                        leagueRepository.getReferenceById(leagueMember.getLeague().getId())
-                ).toList();
-
-        return leagues.stream()
-                .map(league -> mapper.map(league, LeagueDto.class))
-                .collect(Collectors.toList());
 
     }
 

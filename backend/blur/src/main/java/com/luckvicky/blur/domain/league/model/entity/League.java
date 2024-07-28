@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "leagues")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class League extends BaseEntity {
 
     @Column(unique = true, nullable = false)
