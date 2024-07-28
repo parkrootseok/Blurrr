@@ -8,7 +8,7 @@ import lombok.Builder;
 @Builder
 @Schema(name = "사용자 리그 목록 조회 응답")
 public record LeagueMemberListResponse(
-        @Schema(description = "리그 목록")
+        @Schema(description = "사용자 참여 리그 목록")
         List<LeagueMemberDto> leagueMembers
 ) {
 
