@@ -8,8 +8,10 @@ import java.util.UUID;
 
 public interface LeagueService {
 
+    Boolean createLeague(LeagueCreateRequest request);
+
     List<LeagueDto> findLeagueByType(String leagueType);
 
-    Boolean createLeague(LeagueCreateRequest request);
+    List<LeagueDto> getLeagueRanking();
 
 }

@@ -3,6 +3,7 @@ package com.luckvicky.blur.domain.league.controller;
 import com.luckvicky.blur.domain.league.model.dto.LeagueDto;
 import com.luckvicky.blur.domain.league.model.dto.request.LeagueCreateRequest;
 import com.luckvicky.blur.domain.league.model.dto.response.LeagueListResponse;
+import com.luckvicky.blur.domain.league.model.dto.response.LeagueRankingResponse;
 import com.luckvicky.blur.domain.league.service.LeagueService;
 import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.util.ResponseUtil;
@@ -99,5 +100,26 @@ public class LeagueController {
         );
 
     }
+
+    @Operation(
+            summary = "리그 랭킹 조회 API",
+            description = "리그 인원수를 기준으로 내림차순 조회한다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "조회 완료 응답",
+                    content = @Content(schema = @Schema(implementation = LeagueRankingResponse.class))
+            )
+    })
+    @GetMapping("/ranking")
+    public ResponseEntity getLeagueRanking() {
+        return ResponseUtil.ok(
+                Result.builder()
+                        .data(LeagueRankingResponse.of(leagueService.getLeagueRanking()))
+                        .build()
+        );
+    }
+
 
 }
