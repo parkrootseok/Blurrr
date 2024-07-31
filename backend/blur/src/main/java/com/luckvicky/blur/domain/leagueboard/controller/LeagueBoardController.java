@@ -206,11 +206,14 @@ public class LeagueBoardController {
     })
     @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
     @GetMapping("/boards/{boardId}")
-    public ResponseEntity getLeagueBoardDetail(@PathVariable(name = "boardId") UUID boardId) {
+    public ResponseEntity getLeagueBoardDetail(
+            @AuthUser ContextMember member,
+            @PathVariable(name = "boardId") UUID boardId
+    ) {
 
         return ResponseUtil.ok(
                 Result.builder()
-                        .data(LeagueBoardDetailResponse.of(leagueBoardService.getLeagueBoardDetail(boardId)))
+                        .data(LeagueBoardDetailResponse.of(leagueBoardService.getLeagueBoardDetail(member, boardId)))
                         .build()
         );
 
