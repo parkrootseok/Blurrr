@@ -10,7 +10,6 @@ import com.luckvicky.blur.domain.board.exception.InValidSearchConditionException
 import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
-import com.luckvicky.blur.domain.channel.model.dto.SimpleChannelDto;
 import com.luckvicky.blur.domain.channelboard.model.dto.ChannelBoardDto;
 import com.luckvicky.blur.domain.channelboard.model.entity.ChannelBoard;
 import com.luckvicky.blur.domain.channelboard.repository.ChannelBoardRepository;
@@ -25,12 +24,13 @@ import com.luckvicky.blur.domain.league.repository.LeagueRepository;
 import com.luckvicky.blur.domain.leagueboard.model.dto.request.LeagueBoardCreateRequest;
 import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
 import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
-import com.luckvicky.blur.domain.member.model.SimpleMemberDto;
+import com.luckvicky.blur.domain.like.repository.LikeRepository;
 import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.domain.member.repository.MemberRepository;
 import com.luckvicky.blur.global.enums.filter.SearchCondition;
 import com.luckvicky.blur.global.enums.filter.SortingCriteria;
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
+import com.luckvicky.blur.global.jwt.model.ContextMember;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -55,6 +55,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     private final LeagueBoardRepository leagueBoardRepository;
     private final ChannelBoardRepository channelBoardRepository;
     private final DashcamRepository dashcamRepository;
+    private final LikeRepository likeRepository;
 
     @Override
     public Boolean createLeagueBoard(UUID memberId, UUID leagueId, LeagueBoardCreateRequest request) {
@@ -126,7 +127,8 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
-    public BoardDetailDto getLeagueBoardDetail(UUID boardId) {
+    public BoardDetailDto getLeagueBoardDetail(ContextMember member, UUID boardId) {
+
 
         Board board = boardRepository.findByIdForUpdate(boardId)
                 .orElseThrow(NotExistBoardException::new);
@@ -141,7 +143,9 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
                 .map(comment -> mapper.map(comment, CommentDto.class))
                 .collect(Collectors.toList());
 
-        return BoardDetailDto.of(board, comments);
+        return BoardDetailDto.of(
+                board, comments, likeRepository.existsByMemberIdAndBoardId(member.getId(), board.getId())
+        );
 
     }
 
