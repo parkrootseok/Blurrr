@@ -126,10 +126,14 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public BoardDetailDto getLeagueBoardDetail(UUID boardId) {
 
-        Board board = boardRepository.findByIdWithCommentAndReply(boardId)
+        Board board = boardRepository.findByIdForUpdate(boardId)
+                .orElseThrow(NotExistBoardException::new);
+
+        board.increaseViewCount();
+
+        board = boardRepository.findByIdWithCommentAndReply(boardId)
                 .orElseThrow(NotExistBoardException::new);
 
         List<CommentDto> comments = board.getComments().stream()
