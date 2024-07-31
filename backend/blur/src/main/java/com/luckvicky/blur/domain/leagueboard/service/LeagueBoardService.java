@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface LeagueBoardService {
 
-    Boolean createLeagueBoard(UUID leagueId, UUID id, LeagueBoardCreateRequest request);
+    UUID createLeagueBoard(UUID leagueId, UUID id, LeagueBoardCreateRequest request);
 
     List<ChannelBoardDto> getMentionLeagueBoards(UUID leagueId, int pageNumber, String criteria);
 

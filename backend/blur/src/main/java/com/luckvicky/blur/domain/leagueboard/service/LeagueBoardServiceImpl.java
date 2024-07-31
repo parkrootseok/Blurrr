@@ -58,7 +58,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     private final LikeRepository likeRepository;
 
     @Override
-    public Boolean createLeagueBoard(UUID memberId, UUID leagueId, LeagueBoardCreateRequest request) {
+    public UUID createLeagueBoard(UUID memberId, UUID leagueId, LeagueBoardCreateRequest request) {
 
         Member member = memberRepository.getOrThrow(memberId);
         League league = leagueRepository.getOrThrow(leagueId);
@@ -187,12 +187,12 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
     }
 
-    private boolean isCreated(Board createdLeagueBoard) {
+    private UUID isCreated(Board createdLeagueBoard) {
 
         boardRepository.findById(createdLeagueBoard.getId())
                 .orElseThrow(() -> new FailToCreateBoardException());
 
-        return true;
+        return createdLeagueBoard.getId();
     }
 
 }
