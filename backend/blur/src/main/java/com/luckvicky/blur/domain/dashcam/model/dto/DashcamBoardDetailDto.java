@@ -2,7 +2,6 @@ package com.luckvicky.blur.domain.dashcam.model.dto;
 
 import com.luckvicky.blur.domain.channelboard.model.dto.MentionDto;
 import com.luckvicky.blur.domain.comment.model.dto.CommentDto;
-import com.luckvicky.blur.domain.dashcam.model.entity.Option;
 import com.luckvicky.blur.domain.member.model.SimpleMemberDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -36,6 +35,9 @@ public class DashcamBoardDetailDto {
     @Schema(description = "좋아요 개수")
     private Long  likeCount;
 
+    @Schema(description = "게시물 투표 수")
+    private Long voteCount;
+
     @Schema(description = "게시물 생성 시간")
     private LocalDateTime createdAt;
 
@@ -46,7 +48,7 @@ public class DashcamBoardDetailDto {
     private String content;
 
     @Schema(description = "게시물 투표 목록")
-    private List<Option> options;
+    private List<OptionDto> options;
 
     @Schema(description = "멘션된 리그 목록")
     private List<MentionDto> mentionedLeagues;
