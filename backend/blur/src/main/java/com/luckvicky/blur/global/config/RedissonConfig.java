@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class RedissonConfig {
 
     @Bean
-    RedissonClient redissonConfig() {
+    RedissonClient redissonClient() {
 
         Config config = new Config();
         config.useSingleServer().setAddress(REDISSON_ADDRESS);
