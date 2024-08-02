@@ -22,7 +22,7 @@ const ChannelLayout: React.FC<LayoutProps> = ({ children }) => {
    return (
       <LayoutContainer>
          <BreadcrumbContainer>
-            <Breadcrumb channel="채널" subChannel="내 차 자랑" channelUrl="/channels" />
+            <Breadcrumb channel="채널" subChannel="내 차 자랑" channelUrl="/channels" subChannelUrl='/channels/boast' />
          </BreadcrumbContainer>
          {children}
       </LayoutContainer>
