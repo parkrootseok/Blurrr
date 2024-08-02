@@ -1,5 +1,7 @@
 package com.luckvicky.blur.global.constant;
 
+import com.luckvicky.blur.domain.league.model.entity.LeagueType;
+
 public class StringFormat {
 
     public static final String BLANK = " ";
@@ -40,22 +42,42 @@ public class StringFormat {
 
     public static final String REDISSON_ADDRESS = "redis://localhost:6379";
 
+    public static final String LEAGUE_TYPE_MODEL = "MODEL";
+    public static final String LEAGUE_TYPE_BRAND = "BRAND";
+
     // 허용 URI
     public static final String[] PERMIT_ALL_URI = {
             "/h2-console/**",
             "/v1/auth/**",
-            "/health"
-    };
-
-    // 일반 회원 허용 URI
-    public static final String[] GENERAL_USER_URI = {
+            "/health",
             "/v1/channels/hot",
             "/v1/channels/mycar",
             "/v1/channels/today/mycar",
             "/v1/channels/dashcam",
             "/v1/leagues/ranking",
-            "/v1/leagues/brands",
+    };
+
+    // 일반 회원 허용 URI
+    public static final String[] GENERAL_USER_URI = {
+            "/v1/leagues",
             "/v1/leagues/brands/*/boards",
+            "/v1/leagues/*/boards/search",
+            "/v1/channels",
+            "/v1/channels/search",
+            "/v1/channels/*",
+            "/v1/channels/*/boards",
+            "/v1/channels/*/boards/*",
+            "/v1/alarm/**",
+            "/v1/members/**"
+    };
+
+    // 일반 회원 허용 URI
+    public static final String[] GENERAL_USER_OF_LEAGUE_URI = {
+            // 리그 목록 조회 완료
+            "/v1/leagues",
+
+            // 리그 게시글 목록 조회
+            "/v1/leagues/*/boards",
             "/v1/leagues/*/boards/search",
             "/v1/channels",
             "/v1/channels/search",
