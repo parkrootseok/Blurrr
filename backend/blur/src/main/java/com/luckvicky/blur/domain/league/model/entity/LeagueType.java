@@ -14,7 +14,7 @@ public enum LeagueType {
 
     BRAND(LEAGUE_TYPE_BRAND), MODEL(LEAGUE_TYPE_MODEL);
 
-    private final String type;
+    private final String value;
 
     public static LeagueType convertToEnum(String type) {
 
