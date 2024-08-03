@@ -1,6 +1,8 @@
 package com.luckvicky.blur.global.config;
 
-import com.luckvicky.blur.global.interceptor.LeagueAccessInterceptor;
+import static com.luckvicky.blur.global.constant.StringFormat.GUEST_URI_OF_LEAGUE;
+
+import com.luckvicky.blur.global.interceptor.LeagueInterceptor;
 import com.luckvicky.blur.global.security.AuthArgumentResolver;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
@@ -20,9 +22,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        registry.addInterceptor(new LeagueAccessInterceptor())
-                // 적용할 URI
-                .addPathPatterns("/v1/leagues/**");
+        registry.addInterceptor(new LeagueInterceptor())
+                .addPathPatterns(GUEST_URI_OF_LEAGUE);
 
     }
 

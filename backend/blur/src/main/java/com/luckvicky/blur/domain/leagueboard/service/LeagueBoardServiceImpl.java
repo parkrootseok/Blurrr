@@ -23,7 +23,7 @@ import com.luckvicky.blur.domain.leagueboard.model.dto.request.LeagueBoardCreate
 import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
 import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
 import com.luckvicky.blur.domain.leaguemember.exception.NotAllocatedLeagueException;
-import com.luckvicky.blur.domain.leaguemember.service.LeagueMemberService;
+import com.luckvicky.blur.domain.leaguemember.repository.LeagueMemberRepository;
 import com.luckvicky.blur.domain.like.repository.LikeRepository;
 import com.luckvicky.blur.domain.member.exception.NotExistMemberException;
 import com.luckvicky.blur.domain.member.model.entity.Member;
@@ -43,7 +43,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,16 +58,18 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     private final LeagueBoardRepository leagueBoardRepository;
     private final ChannelBoardRepository channelBoardRepository;
     private final LikeRepository likeRepository;
-    private final LeagueMemberService leagueMemberService;
-    private final UserDetailsService userDetailsService;
+    private final LeagueMemberRepository leagueMemberRepository;
 
     @Override
-    public UUID createLeagueBoard(UUID memberId, UUID leagueId, LeagueBoardCreateRequest request) {
+    public UUID createLeagueBoard(UUID memberId, UUID leagueId, String leagueType,
+            LeagueBoardCreateRequest request) {
 
-        League league = leagueRepository.getOrThrow(leagueId);
         Member member = memberRepository.getOrThrow(memberId);
+        League league = leagueRepository.getOrThrow(leagueId);
 
-        if (!leagueMemberService.checkLeagueAllocationOfMember(league, member)) {
+        isEqualLeagueType(LeagueType.convertToEnum(leagueType), league.getType());
+
+        if (!leagueMemberRepository.existsByLeagueAndMember(league, member)) {
             throw new NotAllocatedLeagueException();
         }
 
@@ -86,11 +87,9 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
         League league = leagueRepository.getOrThrow(leagueId);
 
-        if (!league.getType().equals(LeagueType.convertToEnum(leagueType))) {
-            throw new InvalidLeagueTypeException();
-        }
+        isEqualLeagueType(LeagueType.convertToEnum(leagueType), league.getType());
 
-        if (league.getType().equals(LeagueType.MODEL) && !isAllocated(league)) {
+        if (league.getType().equals(LeagueType.MODEL) && !isAllocatedOfModelTypeLeague(league)) {
             throw new NotAllocatedLeagueException();
         }
 
@@ -108,25 +107,6 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
     }
 
-    private Boolean isAllocated(League league) {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null) {
-            throw new NotExistMemberException();
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        if (!(principal instanceof CustomUserDetails userDetails)) {
-            throw new NotExistMemberException();
-        }
-
-        return leagueMemberService.checkLeagueAllocationOfMember(league,
-                memberRepository.getOrThrow(userDetails.getMember().getId()));
-
-    }
-
     @Override
     public BoardDetailDto getLeagueBoardDetail(UUID memberId, UUID boardId) {
 
@@ -134,7 +114,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
         LeagueBoard board = leagueBoardRepository.findByIdForUpdate(boardId, ActivateStatus.ACTIVE)
                 .orElseThrow(NotExistBoardException::new);
 
-        if (!leagueMemberService.checkLeagueAllocationOfMember(board.getLeague(), member)) {
+        if (!leagueMemberRepository.existsByLeagueAndMember(board.getLeague(), member)) {
             throw new NotAllocatedLeagueException();
         }
 
@@ -146,13 +126,14 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChannelBoardDto> getMentionLeagueBoards(UUID leagueId, UUID memberId,
-            int pageNumber, String criteria) {
+    public List<ChannelBoardDto> getMentionLeagueBoards(
+            UUID leagueId, UUID memberId, int pageNumber, String criteria
+    ) {
 
         League mentionedLeague = leagueRepository.getOrThrow(leagueId);
         Member member = memberRepository.getOrThrow(memberId);
 
-        if (!leagueMemberService.checkLeagueAllocationOfMember(mentionedLeague, member)) {
+        if (!leagueMemberRepository.existsByLeagueAndMember(mentionedLeague, member)) {
             throw new NotAllocatedLeagueException();
         }
 
@@ -173,10 +154,14 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
-    public List<BoardDto> search(UUID leagueId, String keyword, String condition, int pageNumber,
+    public List<BoardDto> search(UUID leagueId, String leagueType, String keyword, String condition,
+            int pageNumber,
             String criteria) {
 
         League league = leagueRepository.getOrThrow(leagueId);
+
+        isEqualLeagueType(LeagueType.convertToEnum(leagueType), league.getType());
+
         SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
         SearchCondition searchCondition = SearchCondition.convertToEnum(condition);
 
@@ -189,17 +174,15 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
         List<LeagueBoard> leagueBoards;
         switch (searchCondition.getCondition()) {
 
-            case CONDITION_TITLE -> leagueBoards = leagueBoardRepository
-                    .findAllByLeagueAndTitleContainingIgnoreCase(league, keyword.toLowerCase(),
-                            pageable).getContent();
-
-            case CONDITION_CONTENT -> leagueBoards = leagueBoardRepository
-                    .findAllByLeagueAndContentContainingIgnoreCase(league, keyword.toLowerCase(),
-                            pageable).getContent();
-
-            case CONDITION_NICKNAME -> leagueBoards = leagueBoardRepository
-                    .findAllByLeagueAndMemberNicknameContainingIgnoreCase(league,
-                            keyword.toLowerCase(), pageable).getContent();
+            case CONDITION_TITLE ->
+                    leagueBoards = leagueBoardRepository
+                            .findAllByLeagueAndTitleContainingIgnoreCase(league, keyword.toLowerCase(), pageable).getContent();
+            case CONDITION_CONTENT ->
+                    leagueBoards = leagueBoardRepository
+                            .findAllByLeagueAndContentContainingIgnoreCase(league, keyword.toLowerCase(), pageable).getContent();
+            case CONDITION_NICKNAME ->
+                    leagueBoards = leagueBoardRepository
+                            .findAllByLeagueAndMemberNicknameContainingIgnoreCase(league, keyword.toLowerCase(), pageable).getContent();
 
             default -> throw new InValidSearchConditionException();
 
@@ -208,6 +191,33 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
         return leagueBoards.stream()
                 .map(leagueBoard -> mapper.map(leagueBoard, BoardDto.class))
                 .collect(Collectors.toList());
+
+    }
+
+    private static void isEqualLeagueType(LeagueType reqeustType, LeagueType findLeagueType) {
+        if (!reqeustType.equals(findLeagueType)) {
+            throw new InvalidLeagueTypeException();
+        }
+    }
+
+    private Boolean isAllocatedOfModelTypeLeague(League league) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            throw new NotExistMemberException();
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof CustomUserDetails userDetails)) {
+            throw new NotExistMemberException();
+        }
+
+        return leagueMemberRepository.existsByLeagueAndMember(
+                league,
+                memberRepository.getOrThrow(userDetails.getMember().getId())
+        );
 
     }
 
