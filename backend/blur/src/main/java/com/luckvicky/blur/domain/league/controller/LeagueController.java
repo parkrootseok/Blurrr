@@ -9,7 +9,6 @@ import com.luckvicky.blur.domain.league.model.dto.response.LeagueListResponse;
 import com.luckvicky.blur.domain.league.model.dto.response.LeagueRankingResponse;
 import com.luckvicky.blur.domain.league.service.LeagueService;
 import com.luckvicky.blur.global.model.dto.Result;
-import com.luckvicky.blur.global.security.CertificationMember;
 import com.luckvicky.blur.global.util.ResponseUtil;
 import com.luckvicky.blur.global.security.GeneralMember;
 import io.swagger.v3.oas.annotations.Operation;

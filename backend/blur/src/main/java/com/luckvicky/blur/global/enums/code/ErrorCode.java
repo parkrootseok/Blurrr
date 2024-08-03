@@ -29,6 +29,7 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "중복된 이메일이 존재합니다."),
     EXPIRED_EMAIL_CODE(HttpStatus.BAD_REQUEST, "인증 코드의 유효시간이 경과했습니다. 다시 시도해 주세요."),
     ALREADY_VOTED(HttpStatus.BAD_REQUEST, "이미 투표한 사용자입니다."),
+
     /**
      * [401 UnAuthorized]
      * - 요청된 리소스에 대한 유효한 인증 자격 증명이 없음

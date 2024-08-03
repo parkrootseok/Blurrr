@@ -62,6 +62,10 @@ public class LeagueBoardController {
                     description = "접근 권한이 없는 리그"
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "게시글 생성 실패"
             )
@@ -99,6 +103,10 @@ public class LeagueBoardController {
             @ApiResponse(
                     responseCode = "201",
                     description = "게시글 목록 조회 성공 (단, 게시글 없음)"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -160,6 +168,10 @@ public class LeagueBoardController {
             @ApiResponse(
                     responseCode = "201",
                     description = "게시글 목록 조회 성공 (단, 게시글 없음)"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -224,6 +236,10 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
                     description = "접근 권한이 없는 리그"
             ),
             @ApiResponse(
@@ -287,6 +303,10 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
                     description = "접근 권한이 없는 리그"
             ),
             @ApiResponse(
@@ -328,6 +348,10 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
                     description = "접근 권한이 없는 리그"
             ),
             @ApiResponse(
@@ -376,6 +400,10 @@ public class LeagueBoardController {
             @ApiResponse(
                     responseCode = "400",
                     description = "유효하지 않은 검색 조건"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
             ),
             @ApiResponse(
                     responseCode = "404",
