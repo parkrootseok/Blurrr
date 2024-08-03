@@ -60,7 +60,7 @@ public class StringFormat {
     public static final String SIGN_UP_URI = "/v1/auth/**";
 
     // 공용 URI
-    public static final String[] PUBLIC_URI = {
+    public static final String[] GUEST_URI = {
             "/v1/leagues/ranking",
             "/v1/channels/hot",
             "/v1/channels/mycar",
@@ -74,7 +74,7 @@ public class StringFormat {
     };
 
     // 리그 URI
-    public static final String[] PUBLIC_LEAGUE_URI = {
+    public static final String[] GUEST_URI_OF_LEAGUE = {
             "/v1/leagues",
             "/v1/leagues/*/boards",
             "/v1/leagues/*/boards/search"
