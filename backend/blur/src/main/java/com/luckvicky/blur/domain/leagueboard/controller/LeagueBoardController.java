@@ -19,7 +19,6 @@ import com.luckvicky.blur.global.jwt.model.ContextMember;
 import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.security.AuthUser;
 import com.luckvicky.blur.global.security.CertificationMember;
-import com.luckvicky.blur.global.security.GeneralMember;
 import com.luckvicky.blur.global.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -250,18 +249,9 @@ public class LeagueBoardController {
                     description = "게시글 조회 성공",
                     content = @Content(schema = @Schema(implementation = LeagueBoardDetailResponse.class))
             ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "접근 권한 또는 토큰 문제"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "접근 권한이 없는 리그"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "존재하지 않는 게시글"
-            )
+            @ApiResponse(responseCode = "401", description = ErrorMessage.UNAUTHORIZED_ACCESS_MESSAGE),
+            @ApiResponse(responseCode = "403", description = ErrorMessage.NOT_ALLOCATED_LEAGUE_MESSAGE),
+            @ApiResponse(responseCode = "404", description = ErrorMessage.NOT_EXIST_BOARD_MESSAGE)
     })
     @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
     @CertificationMember
@@ -273,8 +263,10 @@ public class LeagueBoardController {
 
         return ResponseUtil.ok(
                 Result.builder()
-                        .data(LeagueBoardDetailResponse.of(
-                                leagueBoardService.getLeagueBoardDetail(member.getId(), boardId))
+                        .data(
+                                LeagueBoardDetailResponse.of(
+                                        leagueBoardService.getLeagueBoardDetail(member.getId(), boardId)
+                                )
                         )
                         .build()
         );
@@ -295,14 +287,8 @@ public class LeagueBoardController {
                     responseCode = "204",
                     description = "댓글 목록 조회 성공 (단, 데이터 없음)"
             ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "접근 권한 또는 토큰 문제"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "접근 권한이 없는 리그"
-            ),
+            @ApiResponse(responseCode = "401", description = ErrorMessage.UNAUTHORIZED_ACCESS_MESSAGE),
+            @ApiResponse(responseCode = "403", description = ErrorMessage.NOT_ALLOCATED_LEAGUE_MESSAGE),
             @ApiResponse(
                     responseCode = "404",
                     description = "존재하지 않는 게시글"
@@ -316,8 +302,8 @@ public class LeagueBoardController {
             @PathVariable(name = "boardId") UUID boardId
     ) {
 
-        CommentListResponse commentsByLeagueBoard = commentService.findCommentsByLeagueBoard(
-                member.getId(), boardId);
+        CommentListResponse commentsByLeagueBoard =
+                commentService.findCommentsByLeagueBoard(member.getId(), boardId);
 
         if (commentsByLeagueBoard.comments().isEmpty()
                 || commentsByLeagueBoard.commentCount() == ZERO) {
@@ -348,18 +334,10 @@ public class LeagueBoardController {
                     responseCode = "204",
                     description = "게시글 검색 (단, 데이터 없음)"
             ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "유효하지 않은 검색 조건"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "접근 권한 또는 토큰 문제"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "존재하지 않는 리그"
-            )
+            @ApiResponse(responseCode = "400", description = ErrorMessage.INVALID_SEARCH_CONDITION_MESSAGE),
+            @ApiResponse(responseCode = "401", description = ErrorMessage.UNAUTHORIZED_ACCESS_MESSAGE),
+            @ApiResponse(responseCode = "403", description = ErrorMessage.NOT_ALLOCATED_LEAGUE_MESSAGE),
+            @ApiResponse(responseCode = "404", description = ErrorMessage.NOT_EXIST_LEAGUE_MESSAGE)
     })
     @Parameters({
             @Parameter(name = "leagueId", description = "리그 고유 식별값", in = ParameterIn.PATH),
@@ -391,7 +369,6 @@ public class LeagueBoardController {
                     }
             ),
     })
-    @GeneralMember
     @GetMapping("/{leagueId}/boards/search")
     public ResponseEntity search(
             @PathVariable("leagueId") UUID leagueId,
