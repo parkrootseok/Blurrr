@@ -41,11 +41,11 @@ public class StringFormat {
     public static final String LEAGUE_TYPE_MODEL = "MODEL";
     public static final String LEAGUE_TYPE_BRAND = "BRAND";
 
-    public static final String AUTH_USER = "AUTH_USER";
-    public static final String BASIC_USER = "BASIC_USER";
-    public static final String ADMIN = "ADMIN";
+    public static final String AUTH_USER = "ROLE_AUTH_USER";
+    public static final String BASIC_USER = "ROLE_BASIC_USER";
+    public static final String ADMIN = "ROLE_ADMIN";
 
-    // Swagger 관련 URI
+    // Utility 관련 URI
     public static final String[] UTILITY_URI = {
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -53,28 +53,31 @@ public class StringFormat {
             "/webjars/**",
             "/swagger-resources/**",
             "/h2-console/**",
-            "/health",
+            "/health"
     };
 
-    // 허용 URI
+    // 회원가입 관련 URI
+    public static final String SIGN_UP_URI = "/v1/auth/**";
+
+    // 공용 URI
     public static final String[] PUBLIC_URI = {
-            "/v1/auth/**"
-    };
-
-    // 일반 회원 허용 URI (회원가입 X)
-    public static final String[] GENERAL_USER_URI = {
+            "/v1/leagues/ranking",
             "/v1/channels/hot",
             "/v1/channels/mycar",
             "/v1/channels/today/mycar",
             "/v1/channels/dashcam",
-            "/v1/leagues/ranking",
-            "/v1/leagues/*/boards",
-            "/v1/leagues/*/boards/search",
             "/v1/channels",
             "/v1/channels/*",
             "/v1/channels/search",
             "/v1/channels/*/boards",
-            "/v1/channels/*/boards/*",
+            "/v1/channels/*/boards/*"
+    };
+
+    // 리그 URI
+    public static final String[] PUBLIC_LEAGUE_URI = {
+            "/v1/leagues",
+            "/v1/leagues/*/boards",
+            "/v1/leagues/*/boards/search"
     };
 
     // 차량 미인증 허용 URI (회원가입 O)
@@ -88,7 +91,6 @@ public class StringFormat {
             "/v1/leagues/boards/*",
             "/v1/leagues/*/boards/*/comments",
             "/v1/leagues/*/mentions",
-            "/v1/leagues/members"
     };
 
 
