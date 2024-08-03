@@ -10,7 +10,6 @@ import com.luckvicky.blur.domain.league.model.dto.response.LeagueRankingResponse
 import com.luckvicky.blur.domain.league.service.LeagueService;
 import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.util.ResponseUtil;
-import com.luckvicky.blur.global.security.GeneralMember;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -136,7 +135,6 @@ public class LeagueController {
                     content = @Content(schema = @Schema(implementation = LeagueRankingResponse.class))
             )
     })
-    @GeneralMember
     @GetMapping("/ranking")
     public ResponseEntity getLeagueRanking() {
         return ResponseUtil.ok(
