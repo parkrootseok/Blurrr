@@ -50,6 +50,14 @@ public class LeagueController {
             @ApiResponse(
                     responseCode = "400",
                     description = "리그 생성 실패"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "토큰 관련 문제"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "접근 권한 없음"
             )
     })
     @PostMapping
@@ -78,6 +86,10 @@ public class LeagueController {
             @ApiResponse(
                     responseCode = "204",
                     description = "조회 완료 (단, 데이터 없음)"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "토큰 관련 문제"
             ),
             @ApiResponse(
                     responseCode = "403",
