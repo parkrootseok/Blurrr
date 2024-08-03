@@ -10,13 +10,11 @@ import com.luckvicky.blur.domain.board.exception.InValidSearchConditionException
 import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
+import com.luckvicky.blur.domain.board.model.entity.Board;
+import com.luckvicky.blur.domain.board.repository.BoardRepository;
 import com.luckvicky.blur.domain.channelboard.model.dto.ChannelBoardDto;
 import com.luckvicky.blur.domain.channelboard.model.entity.ChannelBoard;
 import com.luckvicky.blur.domain.channelboard.repository.ChannelBoardRepository;
-import com.luckvicky.blur.domain.board.model.entity.Board;
-import com.luckvicky.blur.domain.board.repository.BoardRepository;
-import com.luckvicky.blur.domain.dashcam.model.entity.DashCam;
-import com.luckvicky.blur.domain.dashcam.repository.DashcamRepository;
 import com.luckvicky.blur.domain.league.exception.InvalidLeagueTypeException;
 import com.luckvicky.blur.domain.league.model.entity.League;
 import com.luckvicky.blur.domain.league.model.entity.LeagueType;
@@ -27,11 +25,13 @@ import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
 import com.luckvicky.blur.domain.leaguemember.exception.NotAllocatedLeagueException;
 import com.luckvicky.blur.domain.leaguemember.service.LeagueMemberService;
 import com.luckvicky.blur.domain.like.repository.LikeRepository;
+import com.luckvicky.blur.domain.member.exception.NotExistMemberException;
 import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.domain.member.repository.MemberRepository;
 import com.luckvicky.blur.global.enums.filter.SearchCondition;
 import com.luckvicky.blur.global.enums.filter.SortingCriteria;
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
+import com.luckvicky.blur.global.jwt.model.CustomUserDetails;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,6 +41,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,9 +58,9 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     private final LeagueRepository leagueRepository;
     private final LeagueBoardRepository leagueBoardRepository;
     private final ChannelBoardRepository channelBoardRepository;
-    private final DashcamRepository dashcamRepository;
     private final LikeRepository likeRepository;
     private final LeagueMemberService leagueMemberService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public UUID createLeagueBoard(UUID memberId, UUID leagueId, LeagueBoardCreateRequest request) {
@@ -78,8 +81,73 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
+    public List<BoardDto> getLeagueBoards(UUID leagueId, String leagueType, int pageNumber,
+            String criteria) {
+
+        League league = leagueRepository.getOrThrow(leagueId);
+
+        if (!league.getType().equals(LeagueType.convertToEnum(leagueType))) {
+            throw new InvalidLeagueTypeException();
+        }
+
+        if (league.getType().equals(LeagueType.MODEL) && !isAllocated(league)) {
+            throw new NotAllocatedLeagueException();
+        }
+
+        Pageable pageable = PageRequest.of(
+                pageNumber, LEAGUE_BOARD_PAGE_SIZE,
+                Sort.by(Direction.DESC, SortingCriteria.valueOf(criteria).getCriteria())
+        );
+
+        List<LeagueBoard> leagueBoards = leagueBoardRepository
+                .findAllByLeagueAndStatus(league, pageable, ActivateStatus.ACTIVE).getContent();
+
+        return leagueBoards.stream()
+                .map(leagueBoard -> mapper.map(leagueBoard, BoardDto.class))
+                .collect(Collectors.toList());
+
+    }
+
+    private Boolean isAllocated(League league) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            throw new NotExistMemberException();
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof CustomUserDetails userDetails)) {
+            throw new NotExistMemberException();
+        }
+
+        return leagueMemberService.checkLeagueAllocationOfMember(league,
+                memberRepository.getOrThrow(userDetails.getMember().getId()));
+
+    }
+
+    @Override
+    public BoardDetailDto getLeagueBoardDetail(UUID memberId, UUID boardId) {
+
+        Member member = memberRepository.getOrThrow(memberId);
+        LeagueBoard board = leagueBoardRepository.findByIdForUpdate(boardId, ActivateStatus.ACTIVE)
+                .orElseThrow(NotExistBoardException::new);
+
+        if (!leagueMemberService.checkLeagueAllocationOfMember(board.getLeague(), member)) {
+            throw new NotAllocatedLeagueException();
+        }
+
+        board.increaseViewCount();
+
+        return BoardDetailDto.of(board, isLike(member, board));
+
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public List<ChannelBoardDto> getMentionLeagueBoards(UUID leagueId, UUID memberId, int pageNumber, String criteria) {
+    public List<ChannelBoardDto> getMentionLeagueBoards(UUID leagueId, UUID memberId,
+            int pageNumber, String criteria) {
 
         League mentionedLeague = leagueRepository.getOrThrow(leagueId);
         Member member = memberRepository.getOrThrow(memberId);
@@ -105,70 +173,8 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<BoardDto> getBrandLeagueBoards(UUID leagueId, int pageNumber, String criteria) {
-
-        League league = leagueRepository.getOrThrow(leagueId);
-
-        if (LeagueType.MODEL.equals(league.getType())) {
-            throw new InvalidLeagueTypeException();
-        }
-
-        Pageable pageable = PageRequest.of(
-                pageNumber, LEAGUE_BOARD_PAGE_SIZE,
-                Sort.by(Direction.DESC, SortingCriteria.valueOf(criteria).getCriteria())
-        );
-
-        List<LeagueBoard> leagueBoards = leagueBoardRepository
-                .findAllByLeagueAndStatus(league, pageable, ActivateStatus.ACTIVE).getContent();
-
-        return leagueBoards.stream()
-                .map(leagueBoard -> mapper.map(leagueBoard, BoardDto.class))
-                .collect(Collectors.toList());
-
-    }
-
-    @Override
-    public List<BoardDto> getModelLeagueBoards(UUID leagueId, int pageNumber, String criteria) {
-        League league = leagueRepository.getOrThrow(leagueId);
-
-        if (LeagueType.BRAND.equals(league.getType())) {
-            throw new InvalidLeagueTypeException();
-        }
-
-        Pageable pageable = PageRequest.of(
-                pageNumber, LEAGUE_BOARD_PAGE_SIZE,
-                Sort.by(Direction.DESC, SortingCriteria.valueOf(criteria).getCriteria())
-        );
-
-        List<LeagueBoard> leagueBoards = leagueBoardRepository
-                .findAllByLeagueAndStatus(league, pageable, ActivateStatus.ACTIVE).getContent();
-
-        return leagueBoards.stream()
-                .map(leagueBoard -> mapper.map(leagueBoard, BoardDto.class))
-                .collect(Collectors.toList());
-
-    }
-
-    @Override
-    public BoardDetailDto getLeagueBoardDetail(UUID memberId, UUID boardId) {
-
-        Member member = memberRepository.getOrThrow(memberId);
-        LeagueBoard board = leagueBoardRepository.findByIdForUpdate(boardId, ActivateStatus.ACTIVE)
-                .orElseThrow(NotExistBoardException::new);
-
-        if (!leagueMemberService.checkLeagueAllocationOfMember(board.getLeague(), member)) {
-            throw new NotAllocatedLeagueException();
-        }
-
-        board.increaseViewCount();
-
-        return BoardDetailDto.of(board, isLike(member, board));
-
-    }
-
-    @Override
-    public List<BoardDto> search(UUID leagueId, String keyword, String condition, int pageNumber, String criteria) {
+    public List<BoardDto> search(UUID leagueId, String keyword, String condition, int pageNumber,
+            String criteria) {
 
         League league = leagueRepository.getOrThrow(leagueId);
         SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
@@ -183,17 +189,17 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
         List<LeagueBoard> leagueBoards;
         switch (searchCondition.getCondition()) {
 
-            case CONDITION_TITLE ->
-                leagueBoards = leagueBoardRepository
-                        .findAllByLeagueAndTitleContainingIgnoreCase(league, keyword.toLowerCase(), pageable).getContent();
+            case CONDITION_TITLE -> leagueBoards = leagueBoardRepository
+                    .findAllByLeagueAndTitleContainingIgnoreCase(league, keyword.toLowerCase(),
+                            pageable).getContent();
 
-            case CONDITION_CONTENT ->
-                leagueBoards =  leagueBoardRepository
-                        .findAllByLeagueAndContentContainingIgnoreCase(league, keyword.toLowerCase(), pageable).getContent();
+            case CONDITION_CONTENT -> leagueBoards = leagueBoardRepository
+                    .findAllByLeagueAndContentContainingIgnoreCase(league, keyword.toLowerCase(),
+                            pageable).getContent();
 
-            case CONDITION_NICKNAME ->
-                leagueBoards =  leagueBoardRepository
-                        .findAllByLeagueAndMemberNicknameContainingIgnoreCase(league, keyword.toLowerCase(), pageable).getContent();
+            case CONDITION_NICKNAME -> leagueBoards = leagueBoardRepository
+                    .findAllByLeagueAndMemberNicknameContainingIgnoreCase(league,
+                            keyword.toLowerCase(), pageable).getContent();
 
             default -> throw new InValidSearchConditionException();
 

@@ -1,6 +1,8 @@
 package com.luckvicky.blur.domain.leagueboard.controller;
 
 import static com.luckvicky.blur.global.constant.Number.ZERO;
+import static com.luckvicky.blur.global.constant.StringFormat.LEAGUE_TYPE_BRAND;
+import static com.luckvicky.blur.global.constant.StringFormat.LEAGUE_TYPE_MODEL;
 
 import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.channelboard.model.dto.ChannelBoardDto;
@@ -33,6 +35,7 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,7 +66,7 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "토큰에 대한 문제가 있음"
+                    description = "접근 권한 또는 토큰 문제"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -91,8 +94,8 @@ public class LeagueBoardController {
     }
 
     @Operation(
-            summary = "브랜드 리그 게시글 목록 조회 API",
-            description = "브랜드 리그에 대한 게시물 목록을 가져온다."
+            summary = "리그 게시글 목록 조회 API",
+            description = "리그에 대한 게시글 목록을 가져온다."
     )
     @ApiResponses({
             @ApiResponse(
@@ -106,7 +109,7 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "토큰에 대한 문제가 있음"
+                    description = "접근 권한 또는 토큰 문제"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -115,6 +118,14 @@ public class LeagueBoardController {
     })
     @Parameters({
             @Parameter(name = "leagueId", description = "리그 고유 식별값", in = ParameterIn.PATH),
+            @Parameter(
+                    name = "leagueType",
+                    description = "리그 유형",
+                    examples = {
+                            @ExampleObject(name = "브랜드", value = LEAGUE_TYPE_BRAND),
+                            @ExampleObject(name = "모델", value = LEAGUE_TYPE_MODEL)
+                    }
+            ),
             @Parameter(name = "pageNumber", description = "페이지 번호"),
             @Parameter(
                     name = "criteria",
@@ -127,81 +138,17 @@ public class LeagueBoardController {
                     }
             ),
     })
-    @GeneralMember
-    @GetMapping("/brands/{leagueId}/boards")
-    public ResponseEntity getBrandLeagueBoards(
+    @GetMapping("/{leagueId}/boards")
+    public ResponseEntity getLeagueBoards(
             @PathVariable(name = "leagueId") UUID leagueId,
+            @RequestParam(defaultValue = "BRAND", value = "leagueType") String leagueType,
             @RequestParam(required = false, defaultValue = "0", value = "pageNumber") int pageNumber,
             @RequestParam(required = false, defaultValue = "TIME", value = "criteria") String criteria
     ) {
 
-        List<BoardDto> boardDtos = leagueBoardService.getBrandLeagueBoards(
+        List<BoardDto> boardDtos = leagueBoardService.getLeagueBoards(
                 leagueId,
-                pageNumber,
-                criteria
-        );
-
-        if (Objects.isNull(boardDtos) || boardDtos.isEmpty()) {
-            return ResponseUtil.noContent(
-                    Result.builder().build()
-            );
-        }
-
-        return ResponseUtil.ok(
-                Result.builder()
-                        .data(LeagueBoardListResponse.of(boardDtos))
-                        .build()
-        );
-
-    }
-
-    @Operation(
-            summary = "모델 리그 게시글 목록 조회 API",
-            description = "모델 리그에 대한 게시물 목록을 가져온다."
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "게시글 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = LeagueBoardListResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "201",
-                    description = "게시글 목록 조회 성공 (단, 게시글 없음)"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "토큰에 대한 문제가 있음"
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "게시글 목록 조회 실패"
-            )
-    })
-    @Parameters({
-            @Parameter(name = "leagueId", description = "리그 고유 식별값", in = ParameterIn.PATH),
-            @Parameter(name = "pageNumber", description = "페이지 번호"),
-            @Parameter(
-                    name = "criteria",
-                    description = "정렬 기준",
-                    examples = {
-                            @ExampleObject(name = "최신", value = "TIME"),
-                            @ExampleObject(name = "좋아요", value = "LIKE"),
-                            @ExampleObject(name = "조회수", value = "VIEW"),
-                            @ExampleObject(name = "댓글", value = "COMMENT"),
-                    }
-            ),
-    })
-    @CertificationMember
-    @GetMapping("/models/{leagueId}/boards")
-    public ResponseEntity getModelLeagueBoards(
-            @PathVariable(name = "leagueId") UUID leagueId,
-            @RequestParam(required = false, defaultValue = "0", value = "pageNumber") int pageNumber,
-            @RequestParam(required = false, defaultValue = "TIME", value = "criteria") String criteria
-    ) {
-
-        List<BoardDto> boardDtos = leagueBoardService.getModelLeagueBoards(
-                leagueId,
+                leagueType,
                 pageNumber,
                 criteria
         );
@@ -236,7 +183,7 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "토큰에 대한 문제가 있음"
+                    description = "접근 권한 또는 토큰 문제"
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -303,7 +250,7 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "토큰에 대한 문제가 있음"
+                    description = "접근 권한 또는 토큰 문제"
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -348,7 +295,7 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "토큰에 대한 문제가 있음"
+                    description = "접근 권한 또는 토큰 문제"
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -384,8 +331,8 @@ public class LeagueBoardController {
     }
 
     @Operation(
-            summary = "특정 리그 게시글 검색 API",
-            description = "특정 리그에 대한 게시물에 대하여 검색한다."
+            summary = "리그 게시글 검색 API",
+            description = "리그에 대한 게시물에 대하여 검색한다."
     )
     @ApiResponses({
             @ApiResponse(
@@ -403,7 +350,7 @@ public class LeagueBoardController {
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "토큰에 대한 문제가 있음"
+                    description = "접근 권한 또는 토큰 문제"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -412,6 +359,14 @@ public class LeagueBoardController {
     })
     @Parameters({
             @Parameter(name = "leagueId", description = "리그 고유 식별값", in = ParameterIn.PATH),
+            @Parameter(
+                    name = "leagueType",
+                    description = "리그 유형",
+                    examples = {
+                            @ExampleObject(name = "브랜드", value = LEAGUE_TYPE_BRAND),
+                            @ExampleObject(name = "모델", value = LEAGUE_TYPE_MODEL)
+                    }
+            ),
             @Parameter(
                     name = "condition",
                     description = "검색 조건",
@@ -437,6 +392,7 @@ public class LeagueBoardController {
     @GetMapping("/{leagueId}/boards/search")
     public ResponseEntity search(
             @PathVariable("leagueId") UUID leagueId,
+            @RequestParam(defaultValue = "BRAND", value = "leagueType") String leagueType,
             @RequestParam(value = "keyword") String keyword,
             @RequestParam(required = false, defaultValue = "TITLE", value = "condition") String condition,
             @RequestParam(required = false, defaultValue = "0", value = "pageNumber") int pageNumber,

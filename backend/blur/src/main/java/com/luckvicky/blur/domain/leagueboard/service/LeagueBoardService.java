@@ -13,12 +13,10 @@ public interface LeagueBoardService {
 
     List<ChannelBoardDto> getMentionLeagueBoards(UUID leagueId, UUID memberId, int pageNumber, String criteria);
 
-    List<BoardDto> getBrandLeagueBoards(UUID leagueId, int pageNumber, String criteria);
-
     BoardDetailDto getLeagueBoardDetail(UUID memberId, UUID boardId);
 
     List<BoardDto> search(UUID leagueId, String keyword, String condition, int pageNumber, String criteria);
 
-    List<BoardDto> getModelLeagueBoards(UUID leagueId, int pageNumber, String criteria);
+    List<BoardDto> getLeagueBoards(UUID leagueId, String leagueType, int pageNumber, String criteria);
 
 }
