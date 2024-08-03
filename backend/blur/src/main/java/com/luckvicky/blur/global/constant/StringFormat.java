@@ -1,13 +1,9 @@
 package com.luckvicky.blur.global.constant;
 
-import com.luckvicky.blur.domain.league.model.entity.LeagueType;
-
 public class StringFormat {
 
     public static final String BLANK = " ";
     public static final String JWT = "JWT";
-    public static final String AUTH = "Auth";
-    public static final String NO_AUTH = "No Auth";
 
     public static final String VALID_ERROR_RESULT = "{message: '%s'}, {field: '%s'}, {input: '%s'}";
     public static final String VALIDATED_ERROR_RESULT = "{message: '%s'}, {input: '%s'}";
@@ -45,72 +41,56 @@ public class StringFormat {
     public static final String LEAGUE_TYPE_MODEL = "MODEL";
     public static final String LEAGUE_TYPE_BRAND = "BRAND";
 
-    // 허용 URI
-    public static final String[] PERMIT_ALL_URI = {
+    public static final String AUTH_USER = "AUTH_USER";
+    public static final String BASIC_USER = "BASIC_USER";
+    public static final String ADMIN = "ADMIN";
+
+    // Swagger 관련 URI
+    public static final String[] UTILITY_URI = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.index.html",
+            "/webjars/**",
+            "/swagger-resources/**",
             "/h2-console/**",
-            "/v1/auth/**",
             "/health",
+    };
+
+    // 허용 URI
+    public static final String[] PUBLIC_URI = {
+            "/v1/auth/**"
+    };
+
+    // 일반 회원 허용 URI (회원가입 X)
+    public static final String[] GENERAL_USER_URI = {
             "/v1/channels/hot",
             "/v1/channels/mycar",
             "/v1/channels/today/mycar",
             "/v1/channels/dashcam",
             "/v1/leagues/ranking",
-    };
-
-    // 일반 회원 허용 URI
-    public static final String[] GENERAL_USER_URI = {
-            "/v1/leagues",
-            "/v1/leagues/brands/*/boards",
-            "/v1/leagues/*/boards/search",
-            "/v1/channels",
-            "/v1/channels/search",
-            "/v1/channels/*",
-            "/v1/channels/*/boards",
-            "/v1/channels/*/boards/*",
-            "/v1/alarm/**",
-            "/v1/members/**"
-    };
-
-    // 일반 회원 허용 URI
-    public static final String[] GENERAL_USER_OF_LEAGUE_URI = {
-            // 리그 목록 조회 완료
-            "/v1/leagues",
-
-            // 리그 게시글 목록 조회
             "/v1/leagues/*/boards",
             "/v1/leagues/*/boards/search",
             "/v1/channels",
-            "/v1/channels/search",
             "/v1/channels/*",
+            "/v1/channels/search",
             "/v1/channels/*/boards",
             "/v1/channels/*/boards/*",
+    };
+
+    // 차량 미인증 허용 URI (회원가입 O)
+    public static final String[] BASIC_USER_URI = {
             "/v1/alarm/**",
             "/v1/members/**"
     };
 
-    // 차량 미인증 허용 URI
-    public static final String[] BASIC_USER_URI = {
-    };
-
-    // 차량 인증 허용 URI
+    // 차량 인증 허용 URI (회원가입 O)
     public static final String[] AUTH_USER_URI = {
-
+            "/v1/leagues/boards/*",
+            "/v1/leagues/*/boards/*/comments",
+            "/v1/leagues/*/mentions",
+            "/v1/leagues/members"
     };
 
-    // Swagger 관련 URI
-    public static final String[] SWAGGER_URI = {
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.index.html",
-            "/webjars/**",
-            "/swagger-resources/**"
-    };
 
-    // Swagger 관련 URI
-    public static final String[] SWAGGER_EXCLUDE_METHOD_NAME = {
-            "createLeagueBoard",
-            "createLeague",
-            "createBoard",
-    };
 }
 

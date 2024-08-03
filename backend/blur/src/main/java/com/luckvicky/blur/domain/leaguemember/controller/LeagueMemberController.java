@@ -76,6 +76,10 @@ public class LeagueMemberController {
                     description = "성공 (단, 데이터 없음)"
             ),
             @ApiResponse(
+                    responseCode = "401",
+                    description = "토큰에 대한 문제가 있음"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "존재하지 않는 사용자"
             )

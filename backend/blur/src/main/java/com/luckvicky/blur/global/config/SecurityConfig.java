@@ -1,10 +1,12 @@
 package com.luckvicky.blur.global.config;
 
+import static com.luckvicky.blur.domain.member.model.entity.Role.ROLE_AUTH_USER;
+import static com.luckvicky.blur.domain.member.model.entity.Role.ROLE_BASIC_USER;
 import static com.luckvicky.blur.global.constant.StringFormat.AUTH_USER_URI;
 import static com.luckvicky.blur.global.constant.StringFormat.BASIC_USER_URI;
 import static com.luckvicky.blur.global.constant.StringFormat.GENERAL_USER_URI;
-import static com.luckvicky.blur.global.constant.StringFormat.PERMIT_ALL_URI;
-import static com.luckvicky.blur.global.constant.StringFormat.SWAGGER_URI;
+import static com.luckvicky.blur.global.constant.StringFormat.PUBLIC_URI;
+import static com.luckvicky.blur.global.constant.StringFormat.UTILITY_URI;
 
 import com.luckvicky.blur.global.jwt.filter.JwtFilter;
 import com.luckvicky.blur.global.jwt.handler.JwtAccessDeniedHandler;
@@ -13,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -58,19 +59,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requestConfigurer -> requestConfigurer
 
                         // 허용 URI
-                        .requestMatchers(PERMIT_ALL_URI).permitAll()
+                        .requestMatchers(PUBLIC_URI).permitAll()
 
                         // SWAGGER URI
-                        .requestMatchers(SWAGGER_URI).permitAll()
+                        .requestMatchers(UTILITY_URI).permitAll()
 
                         // 일반 유저 URI (GET METHOD만 허용)
                         .requestMatchers(HttpMethod.GET, GENERAL_USER_URI).permitAll()
 
                         // 미인증 유저 URI
-                        .requestMatchers(BASIC_USER_URI).hasAnyRole("BASIC_USER", "AUTH_USER")
+                        .requestMatchers(BASIC_USER_URI).hasAnyRole(ROLE_BASIC_USER.getValue(), ROLE_AUTH_USER.getValue())
 
                         // 인증 유저 URI
-                        .requestMatchers(AUTH_USER_URI).hasAnyRole("AUTH_USER")
+                        .requestMatchers(AUTH_USER_URI).hasRole(ROLE_AUTH_USER.getValue())
 
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
