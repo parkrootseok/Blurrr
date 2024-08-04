@@ -1,6 +1,5 @@
 package com.luckvicky.blur.domain.leagueboard.service;
 
-import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
 import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
@@ -10,7 +9,6 @@ import com.luckvicky.blur.domain.like.exception.FailToDeleteLikeException;
 import com.luckvicky.blur.domain.like.exception.NotExistLikeException;
 import com.luckvicky.blur.domain.like.model.dto.response.LikeCreateResponse;
 import com.luckvicky.blur.domain.like.model.dto.response.LikeDeleteResponse;
-import com.luckvicky.blur.domain.like.model.dto.response.LikeStatusResponse;
 import com.luckvicky.blur.domain.like.model.entity.Like;
 import com.luckvicky.blur.domain.like.repository.LikeRepository;
 import com.luckvicky.blur.domain.member.model.entity.Member;
@@ -19,7 +17,6 @@ import com.luckvicky.blur.infra.redisson.DistributedLock;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,18 +49,6 @@ public class LeagueLikeServiceImpl implements LeagueLikeService {
 
         board.increaseLikeCount();
         return LikeCreateResponse.of(board.getLikeCount(), isLike(member, board));
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public LikeStatusResponse getLikeStatusByBoard(UUID memberId, UUID boardId) {
-
-        Member member = memberRepository.getOrThrow(memberId);
-        LeagueBoard board = leagueBoardRepository.getOrThrow(boardId);
-        isAllocatedLeague(board, member);
-
-        return LikeStatusResponse.of(board.getLikeCount(), isLike(member, board));
 
     }
 
