@@ -35,12 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "좋아요 API")
 @RestController
-@RequestMapping("/v1/members")
+@RequestMapping("/v1/likes")
 @RequiredArgsConstructor
 public class LikeController {
 
     private final LikeService likeService;
-    private final BoardService boardService;
 
     @Operation(
             summary = "좋아요 생성",
@@ -115,5 +114,6 @@ public class LikeController {
         );
 
     }
+
 
 }
