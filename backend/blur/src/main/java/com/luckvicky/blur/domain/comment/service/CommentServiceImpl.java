@@ -98,16 +98,6 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
-    @DistributedLock(value = "#boardId")
-    private static void increaseCommentCount(Board board) {
-        board.increaseCommentCount();
-    }
-
-    @DistributedLock(value = "#boardId")
-    private static void decreaseCommentCount(Board board) {
-        board.decreaseCommentCount();
-    }
-
     @Transactional(readOnly = true)
     public CommentListResponse findCommentsByLeagueBoard(UUID memberId, UUID boardId) {
 
@@ -140,6 +130,16 @@ public class CommentServiceImpl implements CommentService {
                 board.getCommentCount()
         );
 
+    }
+
+    @DistributedLock(value = "#boardId")
+    private static void increaseCommentCount(Board board) {
+        board.increaseCommentCount();
+    }
+
+    @DistributedLock(value = "#boardId")
+    private static void decreaseCommentCount(Board board) {
+        board.decreaseCommentCount();
     }
 
     private Boolean isCreated(Comment comment) {

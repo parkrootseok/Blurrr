@@ -5,6 +5,7 @@ import static com.luckvicky.blur.global.enums.code.ErrorCode.FAIL_TO_CREATE_COMM
 import com.luckvicky.blur.domain.alarm.model.entity.AlarmType;
 import com.luckvicky.blur.domain.alarm.service.AlarmFacade;
 import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
+import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.comment.exception.FailToCreateCommentException;
 import com.luckvicky.blur.domain.comment.exception.FailToDeleteCommentException;
 import com.luckvicky.blur.domain.comment.exception.NotExistCommentException;
@@ -25,6 +26,7 @@ import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.domain.member.repository.MemberRepository;
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
 import com.luckvicky.blur.global.execption.UnauthorizedAccessException;
+import com.luckvicky.blur.infra.redisson.DistributedLock;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -58,12 +60,12 @@ public class LeagueCommentServiceImpl implements LeagueCommentService {
                 .orElseThrow(NotExistBoardException::new);
         isEqualLeague(league, board);
 
-        board.increaseCommentCount();
 
         Comment createdComment = commentRepository.save(
                 request.toEntity(member, board)
         );
 
+        increaseCommentCount(board);
         alarmService.sendAlarm(memberId, AlarmType.ADD_COMMENT, board.getTitle());
 
         return isCreated(createdComment);
@@ -85,12 +87,11 @@ public class LeagueCommentServiceImpl implements LeagueCommentService {
                 .orElseThrow(NotExistCommentException::new);
         isEqualLeague(league, board);
 
-        board.increaseCommentCount();
-
         Comment createdComment = commentRepository.save(
                 request.toEntity(parentComment, member, board)
         );
 
+        increaseCommentCount(board);
         alarmService.sendAlarm(memberId, AlarmType.ADD_COMMENT, board.getTitle());
 
         return isCreated(createdComment);
@@ -117,8 +118,8 @@ public class LeagueCommentServiceImpl implements LeagueCommentService {
                 .orElseThrow(NotExistCommentException::new);
         isEqualLeague(league, board);
 
-        board.decreaseCommentCount();
         comment.inactive();
+        decreaseCommentCount(board);
 
         return isDeleted(comment);
 
@@ -145,6 +146,15 @@ public class LeagueCommentServiceImpl implements LeagueCommentService {
                 board.getCommentCount()
         );
 
+    }
+    @DistributedLock(value = "#boardId")
+    private static void increaseCommentCount(Board board) {
+        board.increaseCommentCount();
+    }
+
+    @DistributedLock(value = "#boardId")
+    private static void decreaseCommentCount(Board board) {
+        board.decreaseCommentCount();
     }
 
     private void isAllocatedLeague(League league, Member member) {
