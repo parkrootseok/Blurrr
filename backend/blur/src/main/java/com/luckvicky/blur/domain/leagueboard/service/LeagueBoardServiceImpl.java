@@ -121,7 +121,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
         board.increaseViewCount();
 
-        return LeagueBoardDetailResponse.of(LeagueBoardDetailDto.of(board));
+        return LeagueBoardDetailResponse.of(mapper.map(board, LeagueBoardDetailDto.class));
 
     }
 
