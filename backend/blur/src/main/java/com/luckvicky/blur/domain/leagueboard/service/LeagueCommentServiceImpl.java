@@ -56,8 +56,7 @@ public class LeagueCommentServiceImpl implements LeagueCommentService {
         League league = leagueRepository.getOrThrow(leagueId);
         isAllocatedLeague(league, member);
 
-        LeagueBoard board = leagueBoardRepository.findByIdForUpdate(boardId, ActivateStatus.ACTIVE)
-                .orElseThrow(NotExistBoardException::new);
+        LeagueBoard board = leagueBoardRepository.getOrThrow(boardId);
         isEqualLeague(league, board);
 
 
@@ -80,8 +79,7 @@ public class LeagueCommentServiceImpl implements LeagueCommentService {
         League league = leagueRepository.getOrThrow(leagueId);
         isAllocatedLeague(league, member);
 
-        LeagueBoard board = leagueBoardRepository.findByIdForUpdate(boardId, ActivateStatus.ACTIVE)
-                .orElseThrow(NotExistBoardException::new);
+        LeagueBoard board = leagueBoardRepository.getOrThrow(boardId);
 
         Comment parentComment = commentRepository.findByIdAndBoard(commentId, board)
                 .orElseThrow(NotExistCommentException::new);
@@ -111,8 +109,7 @@ public class LeagueCommentServiceImpl implements LeagueCommentService {
         League league = leagueRepository.getOrThrow(leagueId);
         isAllocatedLeague(league, member);
 
-        LeagueBoard board = leagueBoardRepository.findByIdForUpdate(boardId, ActivateStatus.ACTIVE)
-                .orElseThrow(NotExistBoardException::new);
+        LeagueBoard board = leagueBoardRepository.getOrThrow(boardId);
 
         Comment comment = commentRepository.findByIdAndBoard(commentId, board)
                 .orElseThrow(NotExistCommentException::new);
