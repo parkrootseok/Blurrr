@@ -1,20 +1,12 @@
 package com.luckvicky.blur.domain.leagueboard.model.dto;
 
-import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.member.model.SimpleMemberDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Schema(name = "게시물 상세 정보")
+@Schema(name = "리그 게시물 상세 정보")
 public class LeagueBoardDetailDto {
 
     @Schema(description = "고유 식별값")
@@ -34,16 +26,5 @@ public class LeagueBoardDetailDto {
 
     @Schema(description = "조회수")
     private Long viewCount;
-
-    public static LeagueBoardDetailDto of(Board board) {
-        return LeagueBoardDetailDto.builder()
-                .id(board.getId())
-                .member(SimpleMemberDto.of(board.getMember()))
-                .title(board.getTitle())
-                .content(board.getContent())
-                .createdAt(board.getCreatedAt().toString())
-                .viewCount(board.getViewCount())
-                .build();
-    }
 
 }
