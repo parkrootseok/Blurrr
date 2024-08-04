@@ -5,6 +5,7 @@ import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
 import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
 import com.luckvicky.blur.domain.leaguemember.exception.NotAllocatedLeagueException;
 import com.luckvicky.blur.domain.leaguemember.repository.LeagueMemberRepository;
+import com.luckvicky.blur.domain.like.exception.FailToCreateLikeException;
 import com.luckvicky.blur.domain.like.exception.FailToDeleteLikeException;
 import com.luckvicky.blur.domain.like.exception.NotExistLikeException;
 import com.luckvicky.blur.domain.like.model.dto.response.LikeCreateResponse;
@@ -44,7 +45,7 @@ public class LeagueLikeServiceImpl implements LeagueLikeService {
 
         Boolean isLike = isLike(member, board);
         if (!isLike) {
-            throw new FailToDeleteLikeException();
+            throw new FailToCreateLikeException();
         }
 
         board.increaseLikeCount();
