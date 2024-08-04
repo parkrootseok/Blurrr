@@ -1,13 +1,16 @@
 package com.luckvicky.blur.domain.like.service;
 
-import com.luckvicky.blur.domain.board.model.dto.BoardDto;
-import java.util.List;
+import com.luckvicky.blur.domain.like.model.dto.response.LikeCreateResponse;
+import com.luckvicky.blur.domain.like.model.dto.response.LikeDeleteResponse;
+import com.luckvicky.blur.domain.like.model.dto.response.LikeStatusResponse;
 import java.util.UUID;
 
 public interface LikeService {
 
-    Boolean createLike(UUID memberId, UUID boardId);
+    LikeCreateResponse createLike(UUID memberId, UUID boardId);
 
-    Boolean deleteLike(UUID memberId, UUID boardId);
+    LikeDeleteResponse deleteLike(UUID memberId, UUID boardId);
+
+    LikeStatusResponse getLikeStatusByBoard(UUID memberId, UUID boardId);
 
 }
