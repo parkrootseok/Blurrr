@@ -6,6 +6,9 @@ import com.luckvicky.blur.domain.board.repository.BoardRepository;
 import com.luckvicky.blur.domain.like.exception.FailToCreateLikeException;
 import com.luckvicky.blur.domain.like.exception.FailToDeleteLikeException;
 import com.luckvicky.blur.domain.like.exception.NotExistLikeException;
+import com.luckvicky.blur.domain.like.model.dto.response.LikeCreateResponse;
+import com.luckvicky.blur.domain.like.model.dto.response.LikeDeleteResponse;
+import com.luckvicky.blur.domain.like.model.dto.response.LikeStatusResponse;
 import com.luckvicky.blur.domain.like.model.entity.Like;
 import com.luckvicky.blur.domain.like.repository.LikeRepository;
 import com.luckvicky.blur.domain.member.model.entity.Member;
@@ -28,39 +31,57 @@ public class LikeServiceImpl implements LikeService {
     private final BoardRepository boardRepository;
 
     @Override
-    public Boolean createLike(UUID memberId, UUID boardId) {
+    public LikeCreateResponse createLike(UUID memberId, UUID boardId) {
 
         Member member = memberRepository.getOrThrow(memberId);
         Board board = boardRepository.getOrThrow(boardId);
 
-        increaseLikeCount(board);
-
-        Like createdLike = likeRepository.save(
+        likeRepository.save(
                 Like.builder()
                         .member(member)
                         .board(board)
                         .build()
         );
 
-        return isCreated(createdLike);
+        Boolean isLike = isLike(member, board);
+        if (!isLike) {
+            throw new FailToDeleteLikeException();
+        }
+
+        increaseLikeCount(board);
+        return LikeCreateResponse.of(board.getLikeCount(), isLike(member, board));
+
     }
 
     @Override
-    public Boolean deleteLike(UUID memberId, UUID boardId) {
+    public LikeStatusResponse getLikeStatusByBoard(UUID memberId, UUID boardId) {
+
+        Member member = memberRepository.getOrThrow(memberId);
+        Board board = boardRepository.getOrThrow(boardId);
+
+        return LikeStatusResponse.of(board.getLikeCount(), isLike(member, board));
+
+    }
+
+    @Override
+    public LikeDeleteResponse deleteLike(UUID memberId, UUID boardId) {
 
         Member member = memberRepository.getOrThrow(memberId);
         Board board = boardRepository.findByIdForUpdate(boardId)
                 .orElseThrow(NotExistBoardException::new);
 
-        decreaseLikeCount(board);
-
         Like findLike = likeRepository.findByMemberAndBoard(member, board)
                 .orElseThrow(NotExistLikeException::new);
 
         likeRepository.deleteById(findLike.getId());
-        boardRepository.save(board);
 
-        return isDeleted(findLike);
+        Boolean isLike = isLike(member, board);
+        if (isLike) {
+            throw new FailToDeleteLikeException();
+        }
+
+        decreaseLikeCount(board);
+        return LikeDeleteResponse.of(board.getLikeCount(), isLike);
 
     }
 
@@ -74,23 +95,9 @@ public class LikeServiceImpl implements LikeService {
         board.decreaseLikeCount();
     }
 
-    private Boolean isCreated(Like createdLike) {
-
-        likeRepository.findById(createdLike.getId())
-                .orElseThrow(FailToCreateLikeException::new);
-
-        return true;
-
+    private Boolean isLike(Member member, Board board) {
+        return likeRepository.existsByMemberAndBoard(member, board);
     }
 
-    private Boolean isDeleted(Like findLike) {
-
-        if (likeRepository.existsById(findLike.getId()))  {
-            throw new FailToDeleteLikeException();
-        }
-
-        return true;
-
-    }
 
 }
