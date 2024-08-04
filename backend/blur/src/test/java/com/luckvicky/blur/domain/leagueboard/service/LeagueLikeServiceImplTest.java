@@ -7,6 +7,8 @@ import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
 import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
 import com.luckvicky.blur.domain.leaguemember.exception.NotAllocatedLeagueException;
 import com.luckvicky.blur.domain.leaguemember.repository.LeagueMemberRepository;
+import com.luckvicky.blur.domain.like.exception.FailToCreateLikeException;
+import com.luckvicky.blur.domain.like.exception.FailToDeleteLikeException;
 import com.luckvicky.blur.domain.like.factory.LikeFactory;
 import com.luckvicky.blur.domain.like.model.dto.response.LikeCreateResponse;
 import com.luckvicky.blur.domain.like.model.dto.response.LikeDeleteResponse;
@@ -99,6 +101,71 @@ public class LeagueLikeServiceImplTest {
     }
 
     @Test
+    @DisplayName("[좋아요 생성 실패]")
+    void FailToCreateLike() {
+
+        given(likeRepository.save(any()))
+                .willReturn(LikeFactory.createLike(member, board));
+
+        given(likeRepository.existsByMemberAndBoard(member, board))
+                .willReturn(Boolean.FALSE);
+
+        assertThatThrownBy(() -> leagueLikeService.createLike(member.getId(), board.getId()))
+                .isInstanceOf(FailToCreateLikeException.class);
+
+    }
+
+    @Test
+    @DisplayName("[좋아요 삭제]")
+    void deleteLike() {
+
+        given(likeRepository.findByMemberAndBoard(member, board))
+                .willReturn(Optional.ofNullable(like));
+
+        doNothing().when(likeRepository).deleteById(like.getId());
+
+        given(likeRepository.existsByMemberAndBoard(member, board))
+                .willReturn(Boolean.FALSE);
+
+        LikeDeleteResponse response = leagueLikeService.deleteLike(member.getId(), board.getId());
+
+        assertThat(response).isNotNull();
+        assertThat(response.likeCount()).isEqualTo(board.getLikeCount());
+        assertThat(response.isLike()).isFalse();
+
+    }
+
+    @Test
+    @DisplayName("[좋아요 삭제 실패]")
+    void FailToDeleteLike() {
+
+        given(likeRepository.findByMemberAndBoard(member, board))
+                .willReturn(Optional.ofNullable(like));
+
+        doNothing().when(likeRepository).deleteById(like.getId());
+
+        given(likeRepository.existsByMemberAndBoard(member, board))
+                .willReturn(Boolean.TRUE);
+
+        assertThatThrownBy(() -> leagueLikeService.deleteLike(member.getId(), board.getId()))
+                .isInstanceOf(FailToDeleteLikeException.class);
+
+    }
+
+
+    @Test
+    @DisplayName("[할당되지 않은 리그 게시글에 대한 좋아요]")
+    void isAllocatedLeague() {
+
+        given(leagueMemberRepository.existsByLeagueAndMember(league, member))
+                .willReturn(false);
+
+        assertThatThrownBy(() -> leagueLikeService.createLike(member.getId(), board.getId()))
+                .isInstanceOf(NotAllocatedLeagueException.class);
+
+    }
+
+    @Test
     @DisplayName("[분산락 적용에 대한 동시성]")
     void distributedLock() throws InterruptedException {
 
@@ -130,18 +197,6 @@ public class LeagueLikeServiceImplTest {
 
         LeagueBoard leagueBoard = leagueBoardRepository.getOrThrow(board.getId());
         assertThat(leagueBoard.getLikeCount()).isCloseTo(beforeLikeCount + numberOfThreads, Offset.offset(1L));
-
-    }
-
-    @Test
-    @DisplayName("[할당되지 않은 리그 게시글에 대한 좋아요]")
-    void isAllocatedLeague() {
-
-        given(leagueMemberRepository.existsByLeagueAndMember(league, member))
-                .willReturn(false);
-
-        assertThatThrownBy(() -> leagueLikeService.createLike(member.getId(), board.getId()))
-                .isInstanceOf(NotAllocatedLeagueException.class);
 
     }
 
