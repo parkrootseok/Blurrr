@@ -99,26 +99,6 @@ public class LeagueLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("[게시글에 대한 좋아요 정보 조회]")
-    void ㅎㄷㅅ() {
-
-        given(likeRepository.findByMemberAndBoard(member, board))
-                .willReturn(Optional.ofNullable(like));
-
-        doNothing().when(likeRepository).deleteById(like.getId());
-
-        given(likeRepository.existsByMemberAndBoard(member, board))
-                .willReturn(Boolean.FALSE);
-
-        LikeDeleteResponse response = leagueLikeService.deleteLike(member.getId(), board.getId());
-
-        assertThat(response).isNotNull();
-        assertThat(response.likeCount()).isEqualTo(board.getLikeCount());
-        assertThat(response.isLike()).isFalse();
-
-    }
-
-    @Test
     @DisplayName("[분산락 적용에 대한 동시성]")
     void distributedLock() throws InterruptedException {
 
