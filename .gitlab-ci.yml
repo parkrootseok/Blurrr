@@ -6,7 +6,7 @@ stages:
   - deploy
 
 before_script:
-  - apt-get update || { echo "apt-get update failed"; exit 1; }
+  - apt-get update
   - apt-get install -y curl
 
   # Node.js와 npm 설치 추가 (Node.js 18.x)
@@ -15,18 +15,18 @@ before_script:
   - node -v
   - npm -v
 
-  # 자바 17 설치
-  - echo "install java"
-  - apt-get install openjdk-17-jdk -y
-  - java -version
+  # # 자바 17 설치
+  # - echo "install java"
+  # - apt-get install openjdk-17-jdk -y
+  # - java -version
 
-  # JAVA_HOME 환경 변수 설정
-  - export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
-  - export PATH="$JAVA_HOME/bin:$PATH"
+  # # JAVA_HOME 환경 변수 설정
+  # - export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
+  # - export PATH="$JAVA_HOME/bin:$PATH"
 
-  # JAVA_HOME과 PATH 확인
-  - echo "JAVA_HOME is set to $JAVA_HOME"
-  - echo "PATH is set to $PATH"
+  # # JAVA_HOME과 PATH 확인
+  # - echo "JAVA_HOME is set to $JAVA_HOME"
+  # - echo "PATH is set to $PATH"
 
 frontend_build:
   stage: frontend_build
@@ -46,12 +46,16 @@ frontend_build:
     - npm run build
 
     # 빌드된 결과물 확인
+    - cd .next/standalone
     - ls -al
 
   artifacts:
     paths:
+      - frontend/.next/standalone
       - frontend/.next/static
+      - frontend/public
     expire_in: 1 week
+
 
   tags:
     - blurrr-deploy
@@ -59,33 +63,33 @@ frontend_build:
   only:
     - dev
 
-backend_build:
-  stage: backend_build
-  script:
-    # YML 파일 가져오기
-    - ls -al backend/blur/src/main/resources
-    - echo "$APPLICATION_YML" > backend/blur/src/main/resources/application.yml
-    - echo "$APPLICATION_MAIL_YML" > backend/blur/src/main/resources/application-mail.yml
-    - echo "$APPLICATION_JWT_YML" > backend/blur/src/main/resources/application-jwt.yml
-    - echo "$APPLICATION_DEV_YML" > backend/blur/src/main/resources/application-dev.yml
-    - echo "$APPLICATION_AWS_YML" > backend/blur/src/main/resources/application-aws.yml
-    - ls -al backend/blur/src/main/resources
+# backend_build:
+#   stage: backend_build
+#   script:
+#     # YML 파일 가져오기
+#     - ls -al backend/blur/src/main/resources
+#     - echo "$APPLICATION_YML" > backend/blur/src/main/resources/application.yml
+#     - echo "$APPLICATION_MAIL_YML" > backend/blur/src/main/resources/application-mail.yml
+#     - echo "$APPLICATION_JWT_YML" > backend/blur/src/main/resources/application-jwt.yml
+#     - echo "$APPLICATION_DEV_YML" > backend/blur/src/main/resources/application-dev.yml
+#     - echo "$APPLICATION_AWS_YML" > backend/blur/src/main/resources/application-aws.yml
+#     - ls -al backend/blur/src/main/resources
 
-    - echo 'Build backend'
-    - cd backend/blur
-    - chmod +x ./gradlew
-    - ./gradlew clean build --refresh-dependencies --stacktrace --info -x test
+#     - echo 'Build backend'
+#     - cd backend/blur
+#     - chmod +x ./gradlew
+#     - ./gradlew clean build --refresh-dependencies --stacktrace --info -x test
 
-  artifacts:
-    paths:
-      - backend/blur/build/libs/*.jar
-    expire_in: 1 week
+#   artifacts:
+#     paths:
+#       - backend/blur/build/libs/*.jar
+#     expire_in: 1 week
 
-  tags:
-    - blurrr-deploy
+#   tags:
+#     - blurrr-deploy
 
-  only:
-    - dev
+#   only:
+#     - dev
 
 deploy_frontend:
   stage: deploy
@@ -101,7 +105,7 @@ deploy_frontend:
     - ssh-keyscan -H $SSH_EC2_HOST >> ~/.ssh/known_hosts
 
     - scp -i ~/.ssh/id_rsa -r frontend/.next ubuntu@$SSH_EC2_HOST:/home/ubuntu/blurrr/frontend
-    - echo "complete file send"
+    - scp -i ~/.ssh/id_rsa -r frontend/public ubuntu@$SSH_EC2_HOST:/home/ubuntu/blurrr/frontend
     - ssh -i ~/.ssh/id_rsa ubuntu@$SSH_EC2_HOST "cd /home/ubuntu/blurrr/frontend && ./deploy.sh"
 
   needs: ["frontend_build"]
@@ -109,34 +113,34 @@ deploy_frontend:
   tags:
     - blurrr-deploy
 
-  only:
-    - dev
+  # only:
+  #   - dev
 
-deploy_backend:
-  stage: deploy
+# deploy_backend:
+#   stage: deploy
 
-  variables:
-    DEPLOY_PATH: "/home/ubuntu/app"
-    SPRING_PROFILE: "dev"
+#   variables:
+#     DEPLOY_PATH: "/home/ubuntu/app"
+#     SPRING_PROFILE: "dev"
 
-  script:
-    - echo "Deploying backend..."
-    - apt-get update
-    - apt-get install openssh-client -y
+#   script:
+#     - echo "Deploying backend..."
+#     - apt-get update
+#     - apt-get install openssh-client -y
 
-    - echo "Setting up SSH key..."
-    - mkdir -p ~/.ssh
-    - echo "$SSH_KEY_PEM" > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
-    - scp -i ~/.ssh/id_rsa backend/blur/build/libs/*.jar ubuntu@$SSH_HOST:$DEPLOY_PATH
-    - ssh -i ~/.ssh/id_rsa ubuntu@$SSH_HOST "cd $DEPLOY_PATH && nohup ./deploy.sh > deploy.log 2>&1 &"
-    - echo "Complete"
+#     - echo "Setting up SSH key..."
+#     - mkdir -p ~/.ssh
+#     - echo "$SSH_KEY_PEM" > ~/.ssh/id_rsa
+#     - chmod 600 ~/.ssh/id_rsa
+#     - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+#     - scp -i ~/.ssh/id_rsa backend/blur/build/libs/*.jar ubuntu@$SSH_HOST:$DEPLOY_PATH
+#     - ssh -i ~/.ssh/id_rsa ubuntu@$SSH_HOST "cd $DEPLOY_PATH && nohup ./deploy.sh > deploy.log 2>&1 &"
+#     - echo "Complete"
 
-  needs: ["backend_build"]
+#   needs: ["backend_build"]
 
-  tags:
-    - blurrr-deploy
+#   tags:
+#     - blurrr-deploy
 
-  only:
-    - dev
+#   only:
+#     - dev
