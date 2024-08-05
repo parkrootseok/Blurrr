@@ -99,7 +99,6 @@ deploy_frontend:
     - apt-get install openssh-client -y
 
     - echo "Setting up SSH key..."
-    - apt-get install openssh-client -y
     - mkdir -p ~/.ssh
     - echo "$SSH_KEY_EC2_PEM" > ~/.ssh/id_rsa
     - chmod 400 ~/.ssh/id_rsa
@@ -107,8 +106,9 @@ deploy_frontend:
 
     - scp -i ~/.ssh/id_rsa -r frontend/.next ubuntu@$SSH_EC2_HOST:/home/ubuntu/blurrr/frontend
     - scp -i ~/.ssh/id_rsa -r frontend/public ubuntu@$SSH_EC2_HOST:/home/ubuntu/blurrr/frontend
+    - echo "complete file send"
     - ssh -i ~/.ssh/id_rsa ubuntu@$SSH_EC2_HOST "cd /home/ubuntu/blurrr/frontend && ./deploy.sh"
-
+    
   needs: ["frontend_build"]
 
   tags:
