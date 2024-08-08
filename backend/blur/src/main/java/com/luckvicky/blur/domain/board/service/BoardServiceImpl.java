@@ -171,23 +171,22 @@ public class BoardServiceImpl implements BoardService {
         return true;
     }
 
-//    @Override
-//    public boolean increaseViewCount(UUID boardId, ContextMember nullableMember) {
-//
-//        Board board = boardRepository.getOrThrow(boardId);
-//
-//        if (Objects.nonNull(nullableMember)) {
-//            Member member = memberRepository.getOrThrow(nullableMember.getId());
-//
-//            if (board.getMember().getId().equals(member.getId())) {
-//                return false;
-//            }
-//        }
-//
-//
-//
-//        board.increaseViewCount();
-//        boardRepository.save(board);
-//    }
+    @Override
+    public boolean increaseViewCount(UUID boardId, ContextMember nullableMember) {
+
+        Board board = boardRepository.getOrThrow(boardId);
+
+        if (Objects.nonNull(nullableMember)) {
+            Member member = memberRepository.getOrThrow(nullableMember.getId());
+
+            if (board.getMember().getId().equals(member.getId())) {
+                return false;
+            }
+        }
+
+        board.increaseViewCount();
+        boardRepository.save(board);
+        return true;
+    }
 
 }
