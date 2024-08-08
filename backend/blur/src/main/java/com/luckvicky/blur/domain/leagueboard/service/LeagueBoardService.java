@@ -19,8 +19,6 @@ public interface LeagueBoardService {
 
     LeagueBoardDetailResponse getLeagueBoardDetail(UUID memberId, UUID boardId);
 
-    PaginatedResponse<LeagueBoardDto> search(UUID leagueId, String leagueType, String keyword, String condition, int pageNumber, String criteria);
-
     PaginatedResponse<LeagueBoardListResponse> getLeagueBoards(ContextMember contextMember, UUID leagueId, String leagueType, int pageNumber, String criteria);
 
 }
