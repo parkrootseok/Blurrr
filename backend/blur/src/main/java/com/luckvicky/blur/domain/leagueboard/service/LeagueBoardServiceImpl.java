@@ -56,7 +56,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LeagueBoardServiceImpl implements LeagueBoardService {
 
-    private final ModelMapper mapper;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
     private final LeagueRepository leagueRepository;
@@ -161,58 +160,6 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
                 paginatedResult.getTotalPages(),
                 paginatedResult.stream()
                         .map(LeagueMentionListResponse::of)
-                        .collect(Collectors.toList())
-        );
-
-    }
-
-    @Override
-    public PaginatedResponse<LeagueBoardDto> search(
-            UUID leagueId,
-            String leagueType,
-            String keyword,
-            String condition,
-            int pageNumber,
-            String criteria
-    ) {
-
-        League league = leagueRepository.getOrThrow(leagueId);
-
-        isEqualLeagueType(LeagueType.convertToEnum(leagueType), league.getType());
-
-        SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
-        SearchCondition searchCondition = SearchCondition.convertToEnum(condition);
-
-        Pageable pageable = PageRequest.of(
-                pageNumber,
-                LEAGUE_BOARD_PAGE_SIZE,
-                Sort.by(Direction.DESC, sortingCriteria.getCriteria())
-        );
-
-        Page<LeagueBoard> paginatedResult;
-        switch (searchCondition.getCondition()) {
-
-            case CONDITION_TITLE ->
-                    paginatedResult = leagueBoardRepository
-                            .findAllByLeagueAndTitleContainingIgnoreCase(league, keyword.toLowerCase(), pageable);
-            case CONDITION_CONTENT ->
-                    paginatedResult = leagueBoardRepository
-                            .findAllByLeagueAndContentContainingIgnoreCase(league, keyword.toLowerCase(), pageable);
-            case CONDITION_NICKNAME ->
-                    paginatedResult = leagueBoardRepository
-                            .findAllByLeagueAndMemberNicknameContainingIgnoreCase(league, keyword.toLowerCase(), pageable);
-
-            default -> throw new InValidSearchConditionException();
-
-        }
-
-        return PaginatedResponse.of(
-                paginatedResult.getNumber(),
-                paginatedResult.getSize(),
-                paginatedResult.getTotalElements(),
-                paginatedResult.getTotalPages(),
-                paginatedResult.getContent().stream()
-                        .map(LeagueBoardDto::of)
                         .collect(Collectors.toList())
         );
 
