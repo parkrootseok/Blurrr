@@ -91,7 +91,7 @@ public class MemberController {
     }
 
     @Operation(summary = "좋아요 채널 게시글 조회 API", description = "사용자가 좋아요 누른 게시글 목록을 조회한다.")
-    @GetMapping("/likes/leagues/boards")
+    @GetMapping("/likes/channel/boards")
     public ResponseEntity<Result<PaginatedResponse<ChannelBoardResponse>>> findLikeChannelBoards(
             @AuthUser ContextMember member,
             @RequestParam(required = false, defaultValue = "0", value = "pageNumber") int pageNumber
@@ -108,28 +108,28 @@ public class MemberController {
 
     }
 
-    @Operation(
-            summary = "작성 게시글 조회 API",
-            description = "사용자가 작성한 게시글 목록을 조회한다."
-    )
-    @GetMapping("/boards")
-    public ResponseEntity<Result<PaginatedResponse<MyBoardListResponse>>> findBoardsByMember(
-            @AuthUser ContextMember member,
-            @RequestParam(required = false, defaultValue = "0", value = "pageNumber") int pageNumber,
-            @RequestParam(required = false, defaultValue = "TIME", value = "criteria") String criteria
-    ) {
-
-        PaginatedResponse<MyBoardListResponse> boards = boardService.findMyBoard(
-                member.getId(), pageNumber, criteria
-        );
-
-        if (Objects.isNull(boards.getContent()) || boards.getContent().isEmpty()) {
-            return ResponseUtil.noContent(Result.empty());
-        }
-
-        return ResponseUtil.ok(Result.of(boards));
-
-    }
+//    @Operation(
+//            summary = "작성 게시글 조회 API",
+//            description = "사용자가 작성한 게시글 목록을 조회한다."
+//    )
+//    @GetMapping("/boards")
+//    public ResponseEntity<Result<PaginatedResponse<MyBoardListResponse>>> findBoardsByMember(
+//            @AuthUser ContextMember member,
+//            @RequestParam(required = false, defaultValue = "0", value = "pageNumber") int pageNumber,
+//            @RequestParam(required = false, defaultValue = "TIME", value = "criteria") String criteria
+//    ) {
+//
+//        PaginatedResponse<MyBoardListResponse> boards = boardService.findMyBoard(
+//                member.getId(), pageNumber, criteria
+//        );
+//
+//        if (Objects.isNull(boards.getContent()) || boards.getContent().isEmpty()) {
+//            return ResponseUtil.noContent(Result.empty());
+//        }
+//
+//        return ResponseUtil.ok(Result.of(boards));
+//
+//    }
 
     @Operation(description = "마이페이지 비밀번호 변경")
     @PutMapping("/password")
