@@ -7,9 +7,7 @@ import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.exception.UnauthorizedBoardDeleteException;
 import com.luckvicky.blur.domain.board.factory.BoardFactory;
 import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
-import com.luckvicky.blur.domain.board.model.dto.BoardDto;
 import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateRequest;
-import com.luckvicky.blur.domain.board.model.dto.response.BoardListResponse;
 import com.luckvicky.blur.domain.board.model.dto.response.LikeBoardListResponse;
 import com.luckvicky.blur.domain.board.model.dto.response.MyBoardListResponse;
 import com.luckvicky.blur.domain.board.model.entity.Board;
@@ -24,8 +22,10 @@ import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.domain.member.repository.MemberRepository;
 import com.luckvicky.blur.global.enums.filter.SortingCriteria;
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
+import com.luckvicky.blur.global.jwt.model.ContextMember;
 import com.luckvicky.blur.global.model.dto.PaginatedResponse;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
@@ -171,11 +171,23 @@ public class BoardServiceImpl implements BoardService {
         return true;
     }
 
-    @Override
-    public void increaseViewCount(UUID boardId) {
-        var board = boardRepository.getOrThrow(boardId);
-        board.increaseViewCount();
-        boardRepository.save(board);
-    }
+//    @Override
+//    public boolean increaseViewCount(UUID boardId, ContextMember nullableMember) {
+//
+//        Board board = boardRepository.getOrThrow(boardId);
+//
+//        if (Objects.nonNull(nullableMember)) {
+//            Member member = memberRepository.getOrThrow(nullableMember.getId());
+//
+//            if (board.getMember().getId().equals(member.getId())) {
+//                return false;
+//            }
+//        }
+//
+//
+//
+//        board.increaseViewCount();
+//        boardRepository.save(board);
+//    }
 
 }

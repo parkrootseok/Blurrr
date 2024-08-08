@@ -4,6 +4,7 @@ import com.luckvicky.blur.domain.board.model.dto.BoardDetailDto;
 import com.luckvicky.blur.domain.board.model.dto.request.BoardCreateRequest;
 import com.luckvicky.blur.domain.board.model.dto.response.LikeBoardListResponse;
 import com.luckvicky.blur.domain.board.model.dto.response.MyBoardListResponse;
+import com.luckvicky.blur.global.jwt.model.ContextMember;
 import com.luckvicky.blur.global.model.dto.PaginatedResponse;
 import java.util.UUID;
 
@@ -19,5 +20,5 @@ public interface BoardService {
 
     PaginatedResponse<MyBoardListResponse> findMyBoard(UUID id, int pageNumber, String criteria);
 
-    void increaseViewCount(UUID boardId);
+//    boolean increaseViewCount(UUID boardId, ContextMember nullableMember);
 }
