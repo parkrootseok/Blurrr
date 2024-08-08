@@ -85,4 +85,7 @@ public interface ChannelBoardRepository extends JpaRepository<ChannelBoard, UUID
             Pageable pageable, ActivateStatus status, LocalDateTime startDate, LocalDateTime endDate
     );
 
+    @EntityGraph(attributePaths = "member")
+    Page<ChannelBoard> findAllByMemberAndStatus(Member member, ActivateStatus activateStatus, Pageable pageable);
+
 }

@@ -21,4 +21,5 @@ public interface LeagueBoardService {
 
     PaginatedResponse<LeagueBoardResponse> findLeagueBoardByLike(UUID id, int pageNumber);
 
+    PaginatedResponse<LeagueBoardResponse> findMyBoard(UUID id, int pageNumber);
 }

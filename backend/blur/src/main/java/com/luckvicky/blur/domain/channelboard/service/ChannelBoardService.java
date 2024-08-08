@@ -24,4 +24,6 @@ public interface ChannelBoardService {
 
     PaginatedResponse<ChannelBoardResponse> findChannelBoardByLike(UUID id, int pageNumber);
 
+    PaginatedResponse<ChannelBoardResponse> findMyBoard(UUID memberId, int pageNumber);
+
 }
