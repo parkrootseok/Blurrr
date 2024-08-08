@@ -8,11 +8,15 @@ import com.luckvicky.blur.domain.comment.service.CommentService;
 import com.luckvicky.blur.global.jwt.model.ContextMember;
 import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.security.AuthUser;
+import com.luckvicky.blur.global.security.NullableAuthUser;
 import com.luckvicky.blur.global.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,19 +53,22 @@ public class BoardRetrieveController {
         );
     }
 
-    @Operation(
-            summary = "게시글 조회수 증가 API",
-            description = "특정 게시글의 조회수를 증가시킨다."
-    )
-    @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
-    @PostMapping("/{boardId}/view")
-    public ResponseEntity<Result<Void>> viewCountIncrease(
-            @PathVariable(name = "boardId") UUID boardId) {
-        // TODO: 조회수 중복 증가 방지위해 쿠키, 레디스 등의 방법 필요
-        // 조회API와 분리한 이유는 CQRS패턴 참조
-        boardService.increaseViewCount(boardId);
-        return ResponseUtil.ok(Result.empty());
-    }
+//    @Operation(
+//            summary = "게시글 조회수 증가 API",
+//            description = "특정 게시글의 조회수를 증가시킨다."
+//    )
+//    @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
+//    @PostMapping("/{boardId}/view")
+//    public ResponseEntity<Result<Void>> viewCountIncrease(
+//            @PathVariable(name = "boardId") UUID boardId,
+//            @NullableAuthUser ContextMember nullableMember,
+//            HttpServletRequest request, HttpServletResponse response) {
+//
+//        Cookie cookie =
+//
+//        boardService.increaseViewCount(boardId, nullableMember, request, response);
+//        return ResponseUtil.ok(Result.empty());
+//    }
 
     @Operation(
             summary = "게시글 댓글 목록 조회 API",
