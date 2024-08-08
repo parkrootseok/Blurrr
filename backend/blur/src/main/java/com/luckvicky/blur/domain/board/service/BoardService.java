@@ -15,9 +15,7 @@ public interface BoardService {
 
     Boolean deleteBoard(UUID boardId, UUID memberId);
 
-    PaginatedResponse<LikeBoardListResponse> findLikeBoardsByMember(UUID id, int pageNumber, String criteria);
-
-    PaginatedResponse<MyBoardListResponse> findMyBoard(UUID id, int pageNumber, String criteria);
+//    PaginatedResponse<MyBoardListResponse> findMyBoard(UUID id, int pageNumber, String criteria);
 
     void increaseViewCount(UUID boardId);
 }

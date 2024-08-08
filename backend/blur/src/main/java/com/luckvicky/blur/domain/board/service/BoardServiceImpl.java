@@ -83,58 +83,31 @@ public class BoardServiceImpl implements BoardService {
 
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public PaginatedResponse<LikeBoardListResponse> findLikeBoardsByMember(UUID id, int pageNumber, String criteria) {
-
-        SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
-
-        Pageable pageable = PageRequest.of(
-                pageNumber,
-                GENERAL_PAGE_SIZE,
-                Sort.by(Direction.DESC, sortingCriteria.getCriteria())
-        );
-
-        Member member = memberRepository.getOrThrow(id);
-        Page<Board> likeBoards = boardRepository.findLikeBoardListByMember(member, ActivateStatus.ACTIVE, pageable);
-
-        return PaginatedResponse.of(
-                likeBoards.getNumber(),
-                likeBoards.getSize(),
-                likeBoards.getTotalElements(),
-                likeBoards.getTotalPages(),
-                likeBoards.stream()
-                        .map(LikeBoardListResponse::of)
-                        .collect(Collectors.toList())
-        );
-
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public PaginatedResponse<MyBoardListResponse> findMyBoard(UUID memberId, int pageNumber, String criteria) {
-
-        SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
-        Pageable pageable = PageRequest.of(
-                pageNumber,
-                LEAGUE_BOARD_PAGE_SIZE,
-                Sort.by(Direction.DESC, sortingCriteria.getCriteria())
-        );
-
-        Member member = memberRepository.getOrThrow(memberId);
-        Page<Board> boards = boardRepository.findAllByMember(member, pageable);
-
-        return PaginatedResponse.of(
-                boards.getNumber(),
-                boards.getSize(),
-                boards.getTotalElements(),
-                boards.getTotalPages(),
-                boards.stream()
-                        .map(MyBoardListResponse::of)
-                        .collect(Collectors.toList())
-        );
-
-    }
+//    @Override
+//    @Transactional(readOnly = true)
+//    public PaginatedResponse<MyBoardListResponse> findMyBoard(UUID memberId, int pageNumber, String criteria) {
+//
+//        SortingCriteria sortingCriteria = SortingCriteria.convertToEnum(criteria);
+//        Pageable pageable = PageRequest.of(
+//                pageNumber,
+//                LEAGUE_BOARD_PAGE_SIZE,
+//                Sort.by(Direction.DESC, sortingCriteria.getCriteria())
+//        );
+//
+//        Member member = memberRepository.getOrThrow(memberId);
+//        Page<Board> boards = boardRepository.findAllByMember(member, pageable);
+//
+//        return PaginatedResponse.of(
+//                boards.getNumber(),
+//                boards.getSize(),
+//                boards.getTotalElements(),
+//                boards.getTotalPages(),
+//                boards.stream()
+//                        .map(MyBoardListResponse::of)
+//                        .collect(Collectors.toList())
+//        );
+//
+//    }
 
     @Override
     @Transactional(readOnly = true)
