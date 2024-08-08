@@ -9,7 +9,7 @@ import lombok.Builder;
 
 @Builder
 @Schema(name = "리그 게시물 목록 응답")
-public record LeagueBoardListResponse(
+public record LeagueBoardResponse(
 
         @Schema(description = "고유 식별값")
         UUID id,
@@ -34,8 +34,8 @@ public record LeagueBoardListResponse(
 
 ) {
 
-    public static LeagueBoardListResponse of(LeagueBoard board) {
-        return LeagueBoardListResponse.builder()
+    public static LeagueBoardResponse of(LeagueBoard board) {
+        return LeagueBoardResponse.builder()
                 .id(board.getId())
                 .member(SimpleMemberDto.of(board.getMember()))
                 .title(board.getTitle())
