@@ -142,6 +142,32 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
     @Override
     @Transactional(readOnly = true)
+    public PaginatedResponse<LeagueBoardResponse> findMyBoard(UUID memberId, int pageNumber) {
+
+        Member member = memberRepository.getOrThrow(memberId);
+
+        Pageable pageable = PageRequest.of(
+                pageNumber,
+                LEAGUE_BOARD_PAGE_SIZE,
+                Sort.by(Direction.DESC, SortingCriteria.TIME.getCriteria())
+        );
+
+        Page<LeagueBoard> boards = leagueBoardRepository.findAllByMemberAndStatus(member, ActivateStatus.ACTIVE, pageable);
+
+        return PaginatedResponse.of(
+                boards.getNumber(),
+                boards.getSize(),
+                boards.getTotalElements(),
+                boards.getTotalPages(),
+                boards.stream()
+                        .map(LeagueBoardResponse::of)
+                        .collect(Collectors.toList())
+        );
+
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public LeagueBoardDetailResponse getLeagueBoardDetail(UUID memberId, UUID boardId) {
 
         Member member = memberRepository.getOrThrow(memberId);

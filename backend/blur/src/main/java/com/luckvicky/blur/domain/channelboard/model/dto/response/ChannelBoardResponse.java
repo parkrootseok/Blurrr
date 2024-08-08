@@ -40,15 +40,18 @@ public record ChannelBoardResponse(
         @Schema(description = "조회수")
         Long viewCount
 
-
 ) {
     public static ChannelBoardResponse of(ChannelBoard channelBoard, List<MentionDto> mentionedLeagues) {
         return ChannelBoardResponse.builder()
                 .id(channelBoard.getId())
                 .member(SimpleMemberDto.of(channelBoard.getMember()))
                 .title(channelBoard.getTitle())
-                .simpleContent(channelBoard.getContent())
-                .mentionedLeagues(mentionedLeagues)
+                .simpleContent(channelBoard.getContent()
+                        .replaceAll("<[^>]*>", "")
+                        .replaceAll("\\s+", " ")
+                        .trim()
+                        .substring(0, Math.min(30, channelBoard.getContent().length()))
+                        + (channelBoard.getContent().length() > 30 ? "..." : ""))
                 .createdAt(channelBoard.getCreatedAt())
                 .commentCount(channelBoard.getCommentCount())
                 .likeCount(channelBoard.getLikeCount())
