@@ -4,6 +4,7 @@ import com.luckvicky.blur.domain.board.exception.NotExistBoardException;
 import com.luckvicky.blur.domain.board.model.entity.Board;
 import com.luckvicky.blur.domain.board.model.entity.BoardType;
 import com.luckvicky.blur.domain.board.repository.BoardRepository;
+import com.luckvicky.blur.domain.channel.model.dto.response.ChannelListResponse;
 import com.luckvicky.blur.domain.channel.model.entity.Channel;
 import com.luckvicky.blur.domain.channel.repository.ChannelRepository;
 import com.luckvicky.blur.domain.channelboard.mapper.ChannelBoardMapper;
@@ -11,6 +12,7 @@ import com.luckvicky.blur.domain.channelboard.model.dto.ChannelBoardDetailDto;
 import com.luckvicky.blur.domain.channelboard.model.dto.ChannelBoardListDto;
 import com.luckvicky.blur.domain.channelboard.model.dto.MentionDto;
 import com.luckvicky.blur.domain.channelboard.model.dto.request.ChannelBoardCreateRequest;
+import com.luckvicky.blur.domain.channelboard.model.dto.response.ChannelBoardResponse;
 import com.luckvicky.blur.domain.channelboard.model.entity.ChannelBoard;
 import com.luckvicky.blur.domain.channelboard.model.entity.Mention;
 import com.luckvicky.blur.domain.channelboard.repository.MentionRepository;
@@ -36,10 +38,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.luckvicky.blur.global.constant.Number.CHANNEL_BOARD_PAGE_SIZE;
+import static com.luckvicky.blur.global.constant.Number.GENERAL_PAGE_SIZE;
 
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +52,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ChannelBoardServiceImpl implements ChannelBoardService {
-
 
     private final ModelMapper mapper;
     private final ChannelBoardMapper channelBoardMapper;
@@ -170,6 +173,36 @@ public class ChannelBoardServiceImpl implements ChannelBoardService {
         }
 
         return channelBoardMapper.toChannelBoardDto(channelBoard);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginatedResponse<ChannelBoardResponse> findChannelBoardByLike(UUID id, int pageNumber) {
+
+        Member member = memberRepository.getOrThrow(id);
+
+        Pageable pageable = PageRequest.of(
+                pageNumber,
+                GENERAL_PAGE_SIZE,
+                Sort.by(Direction.DESC, SortingCriteria.TIME.getCriteria())
+        );
+
+        Page<ChannelBoard> likeBoards = channelBoardRepository.findAllByMemberAndLike(member, pageable, ActivateStatus.ACTIVE);
+
+        return PaginatedResponse.of(
+                likeBoards.getNumber(),
+                likeBoards.getSize(),
+                likeBoards.getTotalElements(),
+                likeBoards.getTotalPages(),
+                likeBoards.stream()
+                        .map(channelBoard ->
+                            ChannelBoardResponse.of(
+                                    channelBoard, MentionDto.of(mentionRepository.findAllByBoard(channelBoard))
+                            )
+                        )
+                        .collect(Collectors.toList())
+        );
+
     }
 
     private boolean isLike(UUID memberId, Board board) {

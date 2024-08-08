@@ -76,6 +76,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResponse<LeagueBoardResponse> getLeagueBoards(
             ContextMember contextMember, UUID leagueId, String leagueType, int pageNumber, String criteria
     ) {
@@ -110,6 +111,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginatedResponse<LeagueBoardResponse> findLeagueBoardByLike(UUID id, int pageNumber) {
 
         Member member = memberRepository.getOrThrow(id);
@@ -139,6 +141,7 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LeagueBoardDetailResponse getLeagueBoardDetail(UUID memberId, UUID boardId) {
 
         Member member = memberRepository.getOrThrow(memberId);

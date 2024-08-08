@@ -5,6 +5,8 @@ import com.luckvicky.blur.domain.board.model.entity.BoardType;
 import com.luckvicky.blur.domain.channel.model.entity.Channel;
 import com.luckvicky.blur.domain.channelboard.model.entity.ChannelBoard;
 import com.luckvicky.blur.domain.league.model.entity.League;
+import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
+import com.luckvicky.blur.domain.member.model.entity.Member;
 import com.luckvicky.blur.global.enums.status.ActivateStatus;
 import java.time.LocalDateTime;
 import org.springdoc.core.properties.SpringDocConfigProperties.ModelConverters.PageableConverter;
@@ -50,6 +52,12 @@ public interface ChannelBoardRepository extends JpaRepository<ChannelBoard, UUID
     );
 
     Optional<ChannelBoard> findByIdAndChannel(UUID id, Channel channel);
+
+    @Query("SELECT cb "
+            + "FROM ChannelBoard cb "
+            + "INNER JOIN Like l ON l.board = cb AND l.member = :member "
+            + "WHERE cb.member = :member AND cb.status = :status")
+    Page<ChannelBoard> findAllByMemberAndLike(Member member, Pageable pageable, ActivateStatus status);
 
     @Query("SELECT cb "
             + "FROM ChannelBoard cb "
