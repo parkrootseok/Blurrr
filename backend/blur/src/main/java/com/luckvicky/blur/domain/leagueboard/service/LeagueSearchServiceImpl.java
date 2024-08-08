@@ -5,31 +5,20 @@ import static com.luckvicky.blur.global.constant.StringFormat.CONDITION_CONTENT;
 import static com.luckvicky.blur.global.constant.StringFormat.CONDITION_NICKNAME;
 import static com.luckvicky.blur.global.constant.StringFormat.CONDITION_TITLE;
 
-import com.luckvicky.blur.domain.board.exception.FailToCreateBoardException;
 import com.luckvicky.blur.domain.board.exception.InValidSearchConditionException;
-import com.luckvicky.blur.domain.board.model.entity.Board;
-import com.luckvicky.blur.domain.board.repository.BoardRepository;
-import com.luckvicky.blur.domain.channelboard.repository.ChannelBoardRepository;
 import com.luckvicky.blur.domain.league.exception.InvalidLeagueTypeException;
 import com.luckvicky.blur.domain.league.model.entity.League;
 import com.luckvicky.blur.domain.league.model.entity.LeagueType;
 import com.luckvicky.blur.domain.league.repository.LeagueRepository;
-import com.luckvicky.blur.domain.leagueboard.model.dto.LeagueBoardDto;
-import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardListResponse;
+import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardResponse;
 import com.luckvicky.blur.domain.leagueboard.model.entity.LeagueBoard;
 import com.luckvicky.blur.domain.leagueboard.repository.LeagueBoardRepository;
-import com.luckvicky.blur.domain.leaguemember.exception.NotAllocatedLeagueException;
-import com.luckvicky.blur.domain.leaguemember.repository.LeagueMemberRepository;
-import com.luckvicky.blur.domain.like.repository.LikeRepository;
-import com.luckvicky.blur.domain.member.model.entity.Member;
-import com.luckvicky.blur.domain.member.repository.MemberRepository;
 import com.luckvicky.blur.global.enums.filter.SearchCondition;
 import com.luckvicky.blur.global.enums.filter.SortingCriteria;
 import com.luckvicky.blur.global.model.dto.PaginatedResponse;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +36,7 @@ public class LeagueSearchServiceImpl implements LeagueSearchService {
 
     @Override
     @Transactional(readOnly = true)
-    public PaginatedResponse<LeagueBoardListResponse> search(
+    public PaginatedResponse<LeagueBoardResponse> search(
             UUID leagueId,
             String leagueType,
             String keyword,
@@ -92,7 +81,7 @@ public class LeagueSearchServiceImpl implements LeagueSearchService {
                 paginatedResult.getTotalElements(),
                 paginatedResult.getTotalPages(),
                 paginatedResult.getContent().stream()
-                        .map(LeagueBoardListResponse::of)
+                        .map(LeagueBoardResponse::of)
                         .collect(Collectors.toList())
         );
 

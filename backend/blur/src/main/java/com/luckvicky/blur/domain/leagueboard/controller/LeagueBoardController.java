@@ -2,11 +2,12 @@ package com.luckvicky.blur.domain.leagueboard.controller;
 
 import static com.luckvicky.blur.global.constant.Number.ZERO;
 
+import com.luckvicky.blur.domain.board.model.dto.response.LikeBoardListResponse;
 import com.luckvicky.blur.domain.comment.model.dto.response.CommentListResponse;
 import com.luckvicky.blur.domain.leagueboard.model.dto.request.LeagueBoardCreateRequest;
 import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardCreateResponse;
 import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardDetailResponse;
-import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardListResponse;
+import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardResponse;
 import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueMentionListResponse;
 import com.luckvicky.blur.domain.leagueboard.service.LeagueBoardService;
 import com.luckvicky.blur.domain.leagueboard.service.LeagueCommentService;
@@ -96,7 +97,7 @@ public class LeagueBoardController {
             ),
     })
     @GetMapping("/{leagueId}/boards")
-    public ResponseEntity<Result<PaginatedResponse<LeagueBoardListResponse>>> getLeagueBoards(
+    public ResponseEntity<Result<PaginatedResponse<LeagueBoardResponse>>> getLeagueBoards(
             @PathVariable(name = "leagueId") UUID leagueId,
             @NullableAuthUser ContextMember contextMember,
             @RequestParam(defaultValue = "BRAND", value = "leagueType") String leagueType,
@@ -104,7 +105,7 @@ public class LeagueBoardController {
             @RequestParam(required = false, defaultValue = "TIME", value = "criteria") String criteria
     ) {
 
-        PaginatedResponse<LeagueBoardListResponse> response = leagueBoardService.getLeagueBoards(
+        PaginatedResponse<LeagueBoardResponse> response = leagueBoardService.getLeagueBoards(
                 contextMember,
                 leagueId,
                 leagueType,
@@ -198,15 +199,5 @@ public class LeagueBoardController {
         return ResponseUtil.ok(Result.of(response));
 
     }
-
-//    @GetMapping("/boards")
-//    public ResponseEntity<Result<PaginatedResponse<LeagueLikeBoardResponse>>> findLeagueBoardByLike(
-//            @AuthUser ContextMember contextMember
-//    ) {
-//
-//        PaginatedResponse<LikeBoardListResponse> response =
-//
-//    }
-
 
 }

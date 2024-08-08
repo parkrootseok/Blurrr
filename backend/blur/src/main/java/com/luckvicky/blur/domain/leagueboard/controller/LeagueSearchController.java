@@ -1,6 +1,6 @@
 package com.luckvicky.blur.domain.leagueboard.controller;
 
-import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardListResponse;
+import com.luckvicky.blur.domain.leagueboard.model.dto.response.LeagueBoardResponse;
 import com.luckvicky.blur.domain.leagueboard.service.LeagueSearchService;
 import com.luckvicky.blur.global.model.dto.PaginatedResponse;
 import com.luckvicky.blur.global.model.dto.Result;
@@ -60,7 +60,7 @@ public class LeagueSearchController {
             ),
     })
     @GetMapping("/{leagueId}/boards/search")
-    public ResponseEntity<Result<PaginatedResponse<LeagueBoardListResponse>>> search(
+    public ResponseEntity<Result<PaginatedResponse<LeagueBoardResponse>>> search(
             @PathVariable("leagueId") UUID leagueId,
             @RequestParam(defaultValue = "BRAND", value = "leagueType") String leagueType,
             @RequestParam(value = "keyword") String keyword,
@@ -69,7 +69,7 @@ public class LeagueSearchController {
             @RequestParam(required = false, defaultValue = "TIME", value = "criteria") String criteria
     ) {
 
-        PaginatedResponse<LeagueBoardListResponse> response = leagueSearchService.search(
+        PaginatedResponse<LeagueBoardResponse> response = leagueSearchService.search(
                 leagueId, leagueType, keyword, condition, pageNumber, criteria
         );
 
