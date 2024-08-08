@@ -9,6 +9,7 @@ import com.luckvicky.blur.global.jwt.model.ContextMember;
 import com.luckvicky.blur.global.model.dto.Result;
 import com.luckvicky.blur.global.security.AuthUser;
 import com.luckvicky.blur.global.security.NullableAuthUser;
+import com.luckvicky.blur.global.util.CookieUtil;
 import com.luckvicky.blur.global.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,22 +54,30 @@ public class BoardRetrieveController {
         );
     }
 
-//    @Operation(
-//            summary = "게시글 조회수 증가 API",
-//            description = "특정 게시글의 조회수를 증가시킨다."
-//    )
-//    @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
-//    @PostMapping("/{boardId}/view")
-//    public ResponseEntity<Result<Void>> viewCountIncrease(
-//            @PathVariable(name = "boardId") UUID boardId,
-//            @NullableAuthUser ContextMember nullableMember,
-//            HttpServletRequest request, HttpServletResponse response) {
-//
-//        Cookie cookie =
-//
-//        boardService.increaseViewCount(boardId, nullableMember, request, response);
-//        return ResponseUtil.ok(Result.empty());
-//    }
+    @Operation(
+            summary = "게시글 조회수 증가 API",
+            description = "특정 게시글의 조회수를 증가시킨다.(1분내 조회수 증가 중복 방지)"
+    )
+    @Parameter(name = "boardId", description = "게시글 고유 식별값", in = ParameterIn.PATH)
+    @PostMapping("/{boardId}/view")
+    public ResponseEntity<Result<Void>> viewCountIncrease(
+            @PathVariable(name = "boardId") UUID boardId,
+            @NullableAuthUser ContextMember nullableMember,
+            HttpServletRequest request, HttpServletResponse response) {
+
+        String cookieName = boardId.toString();
+        String cookieValue = CookieUtil.getCookieValue(request, cookieName);
+
+        if (cookieValue == null){
+            boolean increased = boardService.increaseViewCount(boardId, nullableMember);
+
+            if(increased){
+                CookieUtil.setCookieValue(response, cookieName, "viewed",60);
+            }
+        }
+
+        return ResponseUtil.ok(Result.empty());
+    }
 
     @Operation(
             summary = "게시글 댓글 목록 조회 API",

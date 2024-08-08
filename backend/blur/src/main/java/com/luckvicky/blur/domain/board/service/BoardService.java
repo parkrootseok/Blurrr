@@ -20,5 +20,5 @@ public interface BoardService {
 
     PaginatedResponse<MyBoardListResponse> findMyBoard(UUID id, int pageNumber, String criteria);
 
-//    boolean increaseViewCount(UUID boardId, ContextMember nullableMember);
+    boolean increaseViewCount(UUID boardId, ContextMember nullableMember);
 }
