@@ -18,7 +18,7 @@ public class RedisViewCounterService {
     private final RedisBoardAdapter redisBoardAdapter;
     private final BoardRepository boardRepository;
 
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/7 * * * ?")
     public void syncViewCount() {
 
         Map<Object, Object> viewCountLog = redisBoardAdapter.getViewCountLogs();
