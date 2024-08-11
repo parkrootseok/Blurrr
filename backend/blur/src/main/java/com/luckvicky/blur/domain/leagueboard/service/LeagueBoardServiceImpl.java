@@ -186,7 +186,8 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
         isAllocatedLeague(board.getLeague(), member);
 
-        long viewCountInRedis = getViewCountInRedis(memberId, boardId, board);
+        // 1. 레디스에서 카운팅 값을 조회한다.
+        long viewCountInRedis = getViewCountInRedis(memberId, board.getId());
 
         return LeagueBoardDetailResponse.of(
                 LeagueBoardDetailDto.of(
@@ -198,19 +199,15 @@ public class LeagueBoardServiceImpl implements LeagueBoardService {
 
     }
 
-    private long getViewCountInRedis(UUID memberId, UUID boardId, LeagueBoard board) {
+    private long getViewCountInRedis(UUID memberId, UUID boardId) {
 
-        long viewCountInRedis = 0;
-
-        if (redisViewCounterService.isVisited(boardId, memberId)) {
-            viewCountInRedis = redisViewCounterService.getViewCountInRedis(boardId);
+        // 2. 조회 기록이 있다면 레디스에 저장된 값을 가져옴
+        if (Boolean.FALSE.equals(redisViewCounterService.isVisited(boardId, memberId))) {
+            return redisViewCounterService.getViewCountInRedis(boardId);
         }
 
-        else {
-            viewCountInRedis = redisViewCounterService.increment(board.getId(), memberId);
-        }
-
-        return viewCountInRedis;
+        // 3. 없다면 레디스에서 카운팅을 수행한 값을 가져옴
+        return redisViewCounterService.increment(boardId, memberId);
 
     }
 
