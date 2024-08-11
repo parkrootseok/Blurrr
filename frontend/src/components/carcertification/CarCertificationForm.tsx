@@ -68,11 +68,10 @@ const CarCertificationForm = () => {
 
     try {
         const result = await submitImageForOCR(imageSrc);
-        console.log(result);
         if (result && result.extracted_texts) {
           setOcrResults({
             vehicle_model: result.vehicleModel || null, 
-          preprocessed_image: result.preprocessed_image || null
+            preprocessed_image: result.preprocessed_image || null
           });
 
 
@@ -116,11 +115,6 @@ const CarCertificationForm = () => {
         onChange={handleImageUpload}
       />
        <Button onClick={handleSubmit}>제출</Button>
-       {ocrResults.preprocessed_image && (
-        <ResultsContainer>
-          <Image src={ocrResults.preprocessed_image} alt="전처리된 이미지" />
-        </ResultsContainer>
-      )}
       {ocrResults.vehicle_model && (
         <ResultsContainer>
           <Div>
